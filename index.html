@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GPU-to-AI Journey</title>
+<style>
+:root{--bg:#f7f6f2;--card:#fff;--ink:#1d1d1b;--mute:#6b6a64;--line:#e3e1d9;--acc:#2f6f4f;--acc2:#d9eadf;--done:#9a9890}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141413;--card:#1e1e1c;--ink:#ecebe6;--mute:#9a9890;--line:#30302c;--acc:#6fbf8f;--acc2:#23392c;--done:#6b6a64}}
+:root[data-theme="dark"]{--bg:#141413;--card:#1e1e1c;--ink:#ecebe6;--mute:#9a9890;--line:#30302c;--acc:#6fbf8f;--acc2:#23392c;--done:#6b6a64}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:860px;margin:0 auto;padding:32px 16px 80px}
+h1{font-size:1.9rem;margin:0 0 4px}
+.sub{color:var(--mute);margin:0 0 24px}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--acc);width:0;transition:width .3s}
+.top{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:24px}
+.top .row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.next{margin-top:12px;font-size:.95rem;color:var(--mute)}
+.next b{color:var(--ink)}
+button{font:inherit;font-size:.85rem;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer}
+button:hover{border-color:var(--acc)}
+details.phase{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:14px}
+details.phase>summary{cursor:pointer;padding:16px;list-style:none;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+details.phase>summary::-webkit-details-marker{display:none}
+.num{width:34px;height:34px;border-radius:50%;background:var(--acc2);color:var(--acc);display:grid;place-items:center;font-weight:700}
+.phase h2{font-size:1.1rem;margin:0}
+.phase .why{color:var(--mute);font-size:.9rem;margin:2px 0 0}
+.pct{font-variant-numeric:tabular-nums;color:var(--mute);font-size:.9rem}
+.phase .bar{margin:0 16px 4px}
+.body{padding:8px 16px 16px}
+.lesson{border-top:1px solid var(--line);padding:14px 0}
+.lesson h3{font-size:1rem;margin:0 0 4px}
+.how{color:var(--mute);font-size:.92rem;margin:0 0 8px}
+.res{font-size:.88rem;margin:0 0 8px;display:flex;flex-wrap:wrap;gap:6px 12px}
+.res a{color:var(--acc)}
+ul.tasks{list-style:none;margin:0;padding:0}
+ul.tasks li{margin:4px 0}
+ul.tasks label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:4px 6px;border-radius:6px}
+ul.tasks label:hover{background:var(--acc2)}
+ul.tasks input{margin-top:5px;accent-color:var(--acc);width:16px;height:16px;flex:none}
+ul.tasks input:checked+span{color:var(--done);text-decoration:line-through}
+.milestone{margin-top:10px;padding:10px 12px;border-left:3px solid var(--acc);background:var(--acc2);border-radius:0 8px 8px 0;font-size:.92rem}
+input[type=file]{display:none}
+</style>
+</head>
+<body>
+<main>
+<h1>From Pixels to GPU-Native AI</h1>
+<p class="sub">Learning path built from the skill set in Rameel Malik's profile: graphics, C++/CUDA, deep learning, medical 3-D vision, transformers, LLM serving, agents. Phases are in dependency order. Each lesson has a method, a few resources and micro tasks of 15–60 minutes. Progress saves in this browser.</p>
+
+<section class="top">
+  <div class="row"><strong id="total">0 / 0 tasks</strong>
+    <span><button id="exp">Export progress</button> <button id="imp">Import</button> <button id="rst">Reset</button></span>
+  </div>
+  <div class="bar"><i id="totalbar"></i></div>
+  <div class="next" id="next"></div>
+  <input type="file" id="file" accept=".json">
+</section>
+
+<div id="phases"></div>
+</main>
+
+<script>
+const R=(n,u)=>[n,u];
+const DATA=[
+{t:"Foundations",why:"Tools and math every later phase assumes.",l:[
+ {t:"Linux shell & Git",how:"Do all work in a terminal from day one. Learn by using, not reading.",r:[R("MIT Missing Semester","https://missing.csail.mit.edu/"),R("Pro Git book","https://git-scm.com/book")],k:["Install WSL2 (Ubuntu) or use native Linux","Navigate, grep, pipe and redirect: finish Missing Semester lecture 1–2 exercises","Create a GitHub repo 'learning-log' and commit a README","Make a branch, change a file, merge it, resolve one deliberate conflict","Write a 10-line bash script that backs up a folder with a timestamp"]},
+ {t:"Python fluently",how:"Write small scripts daily. Focus on data structures, files, virtualenvs and NumPy.",r:[R("Python tutorial","https://docs.python.org/3/tutorial/"),R("NumPy quickstart","https://numpy.org/doc/stable/user/quickstart.html")],k:["Create a venv and install numpy, matplotlib, jupyter","Solve 5 easy problems with lists, dicts and comprehensions","Read a CSV, compute mean/std per column without pandas","Rewrite that with NumPy vectorized ops and time both","Plot a histogram with matplotlib and save it as PNG"]},
+ {t:"Linear algebra",how:"Watch for intuition, then compute by hand and verify in NumPy.",r:[R("3Blue1Brown: Essence of Linear Algebra","https://www.3blue1brown.com/topics/linear-algebra"),R("Mathematics for ML (free book)","https://mml-book.github.io/")],k:["Watch chapters 1–4; multiply two 2×2 matrices by hand, check in NumPy","Implement matrix multiply with triple loop; compare to np.matmul speed","Rotate a set of 2-D points with a rotation matrix and plot before/after","Compute eigenvalues of a 2×2 by hand; verify with np.linalg.eig","Explain in 3 sentences in your log what a dot product measures"]},
+ {t:"Calculus & probability for ML",how:"Only the parts ML uses: derivatives, chain rule, gradients, distributions, expectation.",r:[R("3Blue1Brown: Essence of Calculus","https://www.3blue1brown.com/topics/calculus"),R("Seeing Theory (probability)","https://seeing-theory.brown.edu/")],k:["Differentiate f(x)=x²·sin(x) by hand; check numerically with finite differences","Implement gradient descent to minimise (x−3)² in 15 lines","Simulate 10,000 dice rolls; plot distribution of the sum of two dice","Compute mean, variance, and a 95% interval for a sample","Write down Bayes' rule and solve one medical-test example"]}
+],m:"Milestone: learning-log repo with scripts, notebooks and notes for all four lessons."},
+
+{t:"C++ & build systems",why:"Engines, CUDA hosts and runtimes are C++.",l:[
+ {t:"Modern C++ core",how:"Follow learncpp in order; type every example; compile with warnings on.",r:[R("learncpp.com","https://www.learncpp.com/"),R("cppreference","https://en.cppreference.com/")],k:["Compile hello world with g++ -Wall -Wextra -std=c++20","Write a function overloading exercise and a struct with methods","Use std::vector, std::string, std::unordered_map in a word-count program","Implement a tiny class with constructor, destructor, copy and move","Replace raw new/delete with std::unique_ptr in that class"]},
+ {t:"Memory & performance",how:"Learn how data layout affects speed. Measure everything.",r:[R("What every programmer should know about memory","https://people.freebsd.org/~lstewart/articles/cpumemory.pdf"),R("Compiler Explorer","https://godbolt.org/")],k:["Time summing a 2-D array row-major vs column-major; log the ratio","Compare array-of-structs vs struct-of-arrays for a particle update","Look at -O0 vs -O2 assembly for a loop in Compiler Explorer","Run a program under valgrind or AddressSanitizer and fix one bug","Write a simple arena allocator and benchmark against new"]},
+ {t:"CMake",how:"Every C++ project from now on uses CMake.",r:[R("CMake tutorial","https://cmake.org/cmake/help/latest/guide/tutorial/index.html"),R("Modern CMake","https://cliutils.gitlab.io/modern-cmake/")],k:["Build hello world with a minimal CMakeLists.txt","Split code into a library target and an executable target","Add a third-party lib with FetchContent (e.g. fmt)","Add Debug/Release configs; compare binary speed","Add a test with CTest and run it"]},
+ {t:"Rust basics",how:"Needed later for the inference runtime. Read the Book chapters 1–10 and do rustlings.",r:[R("The Rust Book","https://doc.rust-lang.org/book/"),R("Rustlings","https://github.com/rust-lang/rustlings")],k:["Install rustup; build hello world with cargo","Finish rustlings: variables, functions, ownership, structs","Write a CLI that counts words in a file using std only","Handle errors with Result and the ? operator","Call a C function from Rust via FFI (extern \"C\")"]}
+],m:"Milestone: a CMake C++ project and a Cargo Rust CLI, both in the log repo with benchmark notes."},
+
+{t:"Visual design & CGI",why:"The profile's start: design eye, posters, 3-D art.",l:[
+ {t:"Design fundamentals",how:"Study one principle, then make one poster using only that principle.",r:[R("Canva Design School (free)","https://www.canva.com/designschool/"),R("Figma learn","https://help.figma.com/hc/en-us/categories/360002051613")],k:["Learn hierarchy, contrast, alignment, proximity; write one line on each","Recreate a poster you like in Figma, pixel for pixel","Design an event poster with a strict 2-font, 3-colour limit","Get feedback from 2 people; make one revision","Publish both versions to a Behance or portfolio page"]},
+ {t:"Blender & CGI",how:"Follow a beginner series end to end; then make one original render.",r:[R("Blender Guru donut series","https://www.youtube.com/@blenderguru"),R("Blender manual","https://docs.blender.org/manual/en/latest/")],k:["Install Blender; learn navigation and move/rotate/scale shortcuts","Model a simple object with modifiers (subdivision, bevel)","Add materials and 3-point lighting; render with Cycles","Animate a camera move and render 5 s of video","Make one original CGI poster for an imaginary tech event"]}
+],m:"Milestone: portfolio with 3 posters and 1 CGI render."},
+
+{t:"Real-time graphics",why:"Graphics is how you learn the GPU: pipelines, buffers, shaders.",l:[
+ {t:"OpenGL",how:"Work through LearnOpenGL Getting Started and Lighting, in C++ with CMake.",r:[R("LearnOpenGL","https://learnopengl.com/"),R("The Book of Shaders","https://thebookofshaders.com/")],k:["Open a window with GLFW and clear it to a colour","Draw a triangle with a VBO, VAO and your own shaders","Add textures and a transform matrix (GLM)","Build a fly-through camera","Implement Phong lighting on a cube","Load an .obj model and render it"]},
+ {t:"Rendering techniques",how:"Pick techniques that teach GPU memory: framebuffers, instancing, compute.",r:[R("LearnOpenGL Advanced","https://learnopengl.com/Advanced-OpenGL/Depth-testing"),R("Real-Time Rendering resources","https://www.realtimerendering.com/")],k:["Render to a framebuffer and apply a post-process blur","Draw 100,000 cubes with instancing; record FPS","Write a compute shader that updates particle positions","Profile one frame with RenderDoc and note the slowest draw","Write a short blog note: what costs time on the GPU"]},
+ {t:"Vulkan",how:"Explicit GPU control. Slow and verbose on purpose; finish the triangle and buffers chapters.",r:[R("vulkan-tutorial.com","https://vulkan-tutorial.com/"),R("Vulkan Guide","https://vkguide.dev/")],k:["Install the Vulkan SDK; run vkcube","Create instance, device and swapchain; enable validation layers","Draw the triangle","Add vertex and uniform buffers with staging","Write in your log 5 things OpenGL did for you that Vulkan makes you do"]}
+],m:"Milestone: a small OpenGL scene viewer and a Vulkan triangle-with-buffers app."},
+
+{t:"GPU programming with CUDA",why:"Core skill: kernels, memory, profiling.",l:[
+ {t:"CUDA basics",how:"Read the programming guide sections 1–5 and PMPP chapters 1–5 while coding each example.",r:[R("CUDA C++ Programming Guide","https://docs.nvidia.com/cuda/cuda-c-programming-guide/"),R("Programming Massively Parallel Processors (book)","https://www.elsevier.com/books/programming-massively-parallel-processors/hwu/978-0-323-91231-0")],k:["Install CUDA toolkit (or use free Colab/Kaggle GPU); compile with nvcc","Write vector add; check results against CPU","Experiment with block sizes 64–1024; log timings","Write a 2-D kernel: grayscale conversion of an image","Add error checking macro for every CUDA call"]},
+ {t:"Memory hierarchy",how:"Speed in CUDA is mostly memory. Implement, measure, improve.",r:[R("NVIDIA blog: How to access global memory efficiently","https://developer.nvidia.com/blog/how-access-global-memory-efficiently-cuda-c-kernels/"),R("Simon Boehm: CUDA matmul worklog","https://siboehm.com/articles/22/CUDA-MMM")],k:["Write a naive matrix multiply kernel; measure GFLOPS","Add shared-memory tiling; measure again","Demonstrate coalesced vs strided access with a benchmark","Implement a parallel reduction (sum) with warp shuffles","Use pinned memory and streams to overlap copy and compute"]},
+ {t:"Libraries & profiling",how:"Use Thrust/cuBLAS when they fit; profile with Nsight.",r:[R("Thrust docs","https://nvidia.github.io/cccl/thrust/"),R("Nsight Compute","https://developer.nvidia.com/nsight-compute")],k:["Sort 10M keys with thrust::sort; compare to std::sort","Build a CSR adjacency from an edge list with sort + binary search","Compare your matmul to cuBLAS","Profile one kernel in Nsight Compute; read occupancy and memory throughput","Fix the top bottleneck Nsight shows and log the speedup"]},
+ {t:"CUDA + graphics interop",how:"Connect CUDA output to OpenGL to visualise results in real time.",r:[R("CUDA graphics interop","https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__OPENGL.html")],k:["Register an OpenGL buffer with CUDA","Update vertex positions in a CUDA kernel each frame","Render a CUDA-simulated wave surface","Measure frame time with and without interop copy"]}
+],m:"Milestone: CUDA kernels repo with a benchmark table (naive vs tiled vs cuBLAS) and Nsight screenshots."},
+
+{t:"Machine learning foundations",why:"Concepts before deep learning: data splits, metrics, overfitting.",l:[
+ {t:"Classical ML with scikit-learn",how:"Learn by fitting models on small public datasets.",r:[R("scikit-learn tutorials","https://scikit-learn.org/stable/tutorial/index.html"),R("Kaggle Learn: Intro to ML","https://www.kaggle.com/learn/intro-to-machine-learning")],k:["Train a logistic regression on the breast-cancer dataset","Do train/val/test split and k-fold cross-validation","Compute accuracy, precision, recall, F1, ROC-AUC","Compare a random forest and SVM; tune with GridSearchCV","Show overfitting with a learning curve plot"]},
+ {t:"SQL & data handling",how:"Data lives in tables. Learn enough SQL to query experiment results.",r:[R("SQLBolt","https://sqlbolt.com/"),R("SQLite docs","https://www.sqlite.org/docs.html")],k:["Finish SQLBolt lessons 1–12","Store experiment runs in SQLite from Python","Query best run per model with GROUP BY","Join a runs table with a configs table"]},
+ {t:"MATLAB basics (optional)",how:"Common in engineering courses and imaging labs.",r:[R("MATLAB Onramp (free)","https://matlabacademy.mathworks.com/")],k:["Finish MATLAB Onramp","Load an image and apply a filter","Port one NumPy script to MATLAB"]}
+],m:"Milestone: notebook comparing 3 classifiers with proper metrics and cross-validation."},
+
+{t:"Deep learning with PyTorch",why:"Model work: CNNs, ResNet, EfficientNet, detection.",l:[
+ {t:"Neural nets from scratch",how:"Build backprop yourself once, so PyTorch is no mystery.",r:[R("Karpathy: Neural Networks Zero to Hero","https://karpathy.ai/zero-to-hero.html"),R("Dive into Deep Learning","https://d2l.ai/")],k:["Watch micrograd video and build micrograd yourself","Train a 2-layer MLP on a toy dataset with your autograd","Rebuild it in PyTorch; compare gradients","Implement softmax + cross-entropy and check vs F.cross_entropy"]},
+ {t:"PyTorch training loops",how:"Write the loop by hand every time until it is automatic.",r:[R("PyTorch tutorials","https://pytorch.org/tutorials/"),R("fast.ai course","https://course.fast.ai/")],k:["Train an MLP on MNIST with Dataset/DataLoader","Add validation, early stopping and checkpoint saving","Use mixed precision (torch.autocast) and compare speed","Log metrics to TensorBoard","Profile one epoch with torch.profiler"]},
+ {t:"CNNs: ResNet & EfficientNet",how:"Read the papers' key ideas, implement small versions, then fine-tune pretrained ones.",r:[R("CS231n notes","https://cs231n.github.io/"),R("ResNet paper","https://arxiv.org/abs/1512.03385"),R("EfficientNet paper","https://arxiv.org/abs/1905.11946")],k:["Implement a small CNN for CIFAR-10; reach 70%+","Implement a residual block and a ResNet-18","Fine-tune pretrained ResNet-50 from torchvision on a small dataset","Fine-tune EfficientNet-B0 and compare accuracy/params/speed","Plot a confusion matrix and inspect 10 errors"]},
+ {t:"Object detection: Faster R-CNN",how:"Follow the torchvision detection tutorial, then train on your own labels.",r:[R("TorchVision detection tutorial","https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html"),R("Faster R-CNN paper","https://arxiv.org/abs/1506.01497")],k:["Explain anchors, RPN and RoI pooling in your log","Run pretrained fasterrcnn_resnet50_fpn on 5 images","Fine-tune it on the PennFudan dataset","Compute mAP and recall at IoU 0.5","Label 50 images of your own and train a detector"]}
+],m:"Milestone: a fine-tuned detector and a classifier, each with an honest evaluation report."},
+
+{t:"Medical imaging & 3-D vision",why:"DICOM in, 3-D mesh out: the final-year-project skill set.",l:[
+ {t:"OpenCV",how:"Image processing basics in Python, then C++.",r:[R("OpenCV tutorials","https://docs.opencv.org/4.x/d9/df8/tutorial_root.html")],k:["Load, resize, blur and threshold an image","Find contours and draw bounding boxes","Do edge detection and morphological ops","Rewrite one pipeline in C++ with CMake","Run a webcam loop at 30 FPS with a filter applied"]},
+ {t:"DICOM & CT basics",how:"Understand Hounsfield units, slices, spacing and orientation before any ML.",r:[R("pydicom docs","https://pydicom.github.io/pydicom/stable/"),R("TCIA Lung-PET-CT-Dx","https://www.cancerimagingarchive.net/collection/lung-pet-ct-dx/")],k:["Download a small CT study from TCIA","Read DICOM headers with pydicom; print spacing and slice thickness","Convert pixels to Hounsfield units and window for lung (−1000 to 400)","Stack slices into a 3-D NumPy volume in correct order","Show axial, coronal, sagittal views side by side"]},
+ {t:"SimpleITK & VTK",how:"Use proper medical-imaging libraries for resampling, segmentation and 3-D display.",r:[R("SimpleITK notebooks","https://simpleitk.org/SimpleITK-Notebooks/"),R("VTK examples","https://examples.vtk.org/site/")],k:["Load a DICOM series with SimpleITK","Resample to isotropic 1 mm spacing","Segment lungs with thresholding + connected components","Extract a surface with marching cubes (VTK or scikit-image)","Render the mesh in VTK and save as .stl/.ply"]},
+ {t:"GPU 3-D reconstruction",how:"Move the mesh pipeline to CUDA and keep memory bounded.",r:[R("Marching cubes (Paul Bourke)","https://paulbourke.net/geometry/polygonise/"),R("Laplacian smoothing overview","https://en.wikipedia.org/wiki/Laplacian_smoothing")],k:["Implement marching cubes in CUDA for a 256³ volume","Build vertex adjacency (CSR) on GPU with Thrust","Implement Laplacian smoothing kernel; compare CPU timing","Process volumes in chunks so peak GPU memory stays under a fixed budget","Design a simple binary mesh format and write a loader"]},
+ {t:"End-to-end screening pipeline",how:"Combine detection, classification and 3-D view with subject-disjoint evaluation.",r:[R("Faster R-CNN tutorial (reuse)","https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html")],k:["Split data by patient, never by slice","Train a nodule detector on 2-D slices","Train a subtype classifier on cropped detections","Report accuracy, recall and F1 per class with confidence intervals","Show detections inside the 3-D mesh viewer"]}
+],m:"Milestone: DICOM-to-mesh tool with a detection model and a short write-up of results and limits."},
+
+{t:"Transformers & LLMs",why:"Architecture design: attention variants, long context, training small models.",l:[
+ {t:"Attention from scratch",how:"Code GPT from zero, then read the paper.",r:[R("Karpathy: Let's build GPT","https://www.youtube.com/watch?v=kCc8FmEb1nY"),R("Attention Is All You Need","https://arxiv.org/abs/1706.03762"),R("The Illustrated Transformer","https://jalammar.github.io/illustrated-transformer/")],k:["Implement scaled dot-product attention in NumPy","Add causal mask and multi-head attention in PyTorch","Train a char-level GPT on a small text corpus","Implement a BPE tokenizer (follow minbpe)","Plot attention maps for one sample"]},
+ {t:"Modern architecture choices",how:"Read one paper per variant and implement the core idea in your GPT.",r:[R("GQA paper","https://arxiv.org/abs/2305.13245"),R("RoPE paper","https://arxiv.org/abs/2104.09864"),R("DeepSeek-V2 (MLA)","https://arxiv.org/abs/2405.04434")],k:["Replace learned positions with RoPE","Add RMSNorm and SwiGLU","Implement grouped-query attention; measure KV-cache size","Implement a simplified MLA (latent KV compression)","Compare variants at equal params and tokens; use 3 seeds"]},
+ {t:"Long context & sparse attention",how:"Learn why attention is O(n²) and how to avoid it.",r:[R("FlashAttention paper","https://arxiv.org/abs/2205.14135"),R("Longformer paper","https://arxiv.org/abs/2004.05150")],k:["Measure memory and time of attention at 1K, 4K, 16K tokens","Implement sliding-window attention","Add a few global tokens (Longformer style)","Build a retrieval-copy test: model must copy a token from far back","Report exact-match accuracy vs context length"]},
+ {t:"Train a small LM properly",how:"Matched experiments, held-out evaluation, reproducible configs.",r:[R("nanoGPT","https://github.com/karpathy/nanoGPT"),R("Stanford CS336","https://stanford-cs336.github.io/")],k:["Train a ~10–70M param model on a tokenised dataset","Use cosine LR schedule with warmup and gradient clipping","Evaluate perplexity on held-out data","Run one ablation with 3 seeds and report mean ± std","Write a 1-page experiment report"]}
+],m:"Milestone: your own small transformer with one novel variant and a fair, multi-seed comparison."},
+
+{t:"LLM inference optimisation",why:"Make models run fast and fit memory: kernels, KV cache, runtimes.",l:[
+ {t:"Inference fundamentals",how:"Know prefill vs decode, KV cache and the metrics that matter.",r:[R("vLLM docs","https://docs.vllm.ai/"),R("PagedAttention paper","https://arxiv.org/abs/2309.06180")],k:["Add a KV cache to your GPT; measure tokens/s before and after","Explain why decode is memory-bound in your log","Measure TTFT and per-token latency for a small HF model","Run a model with vLLM and compare throughput to plain HF","Measure p50 and p95 latency under 20 concurrent requests"]},
+ {t:"Quantisation",how:"Trade bits for memory; always measure quality loss.",r:[R("HF quantization guide","https://huggingface.co/docs/transformers/main/en/quantization/overview"),R("llama.cpp","https://github.com/ggml-org/llama.cpp")],k:["Run a model in fp16, int8 and 4-bit; record memory","Compare perplexity across precisions","Implement per-channel int8 weight quantisation yourself","Run a GGUF model with llama.cpp on CPU"]},
+ {t:"Triton kernels",how:"Write GPU kernels in Python; follow the official tutorials in order.",r:[R("Triton tutorials","https://triton-lang.org/main/getting-started/tutorials/index.html")],k:["Write vector add in Triton","Write fused softmax; benchmark vs torch","Write a matmul kernel with autotuning","Write a simple flash-attention forward pass","Plug one kernel into your GPT and measure speedup"]},
+ {t:"Rust/CUDA inference runtime",how:"Build a minimal runtime that loads your model weights and decodes on GPU.",r:[R("candle (Rust ML)","https://github.com/huggingface/candle"),R("cudarc (Rust CUDA bindings)","https://github.com/coreylowman/cudarc")],k:["Export your GPT weights to safetensors","Load them in Rust and run a forward pass on CPU","Launch your own CUDA kernel from Rust","Implement a KV-cache gather kernel for decode","Benchmark decode tokens/s vs your Triton/PyTorch version"]}
+],m:"Milestone: a Rust/CUDA decoder for your small model with a benchmark vs a PyTorch/Triton baseline."},
+
+{t:"Serving infrastructure",why:"Route, qualify and roll back inference in production.",l:[
+ {t:"Networking essentials",how:"Enough networking to run services: TCP/IP, HTTP, DNS, ports.",r:[R("Cisco Networking Academy","https://www.netacad.com/"),R("Beej's Guide to Network Programming","https://beej.us/guide/bgnet/")],k:["Explain TCP handshake and subnetting in your log","Write a TCP echo server and client","Inspect HTTP traffic with curl -v and Wireshark","Take the Cisco CCNA intro or C++ essentials course (optional cert)"]},
+ {t:"Backend & containers",how:"Wrap models in APIs and ship them in containers.",r:[R("FastAPI docs","https://fastapi.tiangolo.com/"),R("Docker get started","https://docs.docker.com/get-started/")],k:["Serve a model behind a FastAPI endpoint with streaming","Containerise it with a GPU-enabled Dockerfile","Load-test with a script sending concurrent requests","Add Prometheus-style metrics: latency, queue depth, errors"]},
+ {t:"Routing, qualification & rollback",how:"Build a router in front of several workers and decide per request.",r:[R("SRE book: Load balancing","https://sre.google/sre-book/load-balancing-datacenter/"),R("Google SRE book","https://sre.google/sre-book/table-of-contents/")],k:["Run 2 inference workers; route round-robin","Route by queue length; compare p95 latency","Write a qualification test: model+GPU+engine must pass before serving","Add automatic fallback to a known-good config on failure","Compute cost per 1K requests from GPU-hour price"]}
+],m:"Milestone: a 2-worker serving stack with smart routing and a before/after latency and cost table."},
+
+{t:"AI agents & applications",why:"Desktop agents, memory, tool use, product apps.",l:[
+ {t:"LLM APIs & tool use",how:"Build agents with a raw loop before using any framework.",r:[R("Anthropic tool use docs","https://docs.anthropic.com/en/docs/build-with-claude/tool-use"),R("Building effective agents","https://www.anthropic.com/research/building-effective-agents")],k:["Call an LLM API and stream a response","Add one tool (calculator) and handle tool calls in a loop","Add file read/write tools with safe path checks","Count tokens and cost per task; log them"]},
+ {t:"Memory & retrieval",how:"Answers must cite the source passage.",r:[R("SQLite FTS5","https://www.sqlite.org/fts5.html"),R("sentence-transformers","https://www.sbert.net/")],k:["Chunk a folder of docs and index with SQLite FTS5","Add embedding search and compare with keyword search","Return answers with the exact source passage","Store long-term agent memory and recall it next session"]},
+ {t:"Coding agent & local stack",how:"Agent edits code, shows diff, runs tests; everything local.",r:[R("Ollama","https://ollama.com/")],k:["Run a local model with Ollama","Make the agent propose an edit as a unified diff","Apply the diff and run tests; retry on failure","Benchmark tokens, peak memory and cost over 20 tasks"]},
+ {t:"Product app",how:"Ship a real app with AI features end to end.",r:[R("Next.js docs","https://nextjs.org/docs")],k:["Build a small event app with auth and a database","Add AI-assisted event creation from a text prompt","Add a referral link flow","Deploy it and get 5 real users"]}
+],m:"Milestone: a local agent with citations and code-editing, plus one deployed AI app."},
+
+{t:"Research & founding",why:"Publish results, benchmark honestly, build a company.",l:[
+ {t:"Reading & writing papers",how:"Read 1 paper a week with the three-pass method; write like a researcher.",r:[R("How to Read a Paper (Keshav)","https://web.stanford.edu/class/ee384m/Handouts/HowtoReadPaper.pdf"),R("Overleaf LaTeX guide","https://www.overleaf.com/learn")],k:["Read 4 papers with three-pass method; summarise each in 5 lines","Write your medical-imaging or LM project as a 4-page LaTeX paper","Add a limitations section that names every weak point","Post a preprint to arXiv or a blog"]},
+ {t:"Benchmarking honestly",how:"Matched baselines, seeds, held-out data, report losses too.",r:[R("ML reproducibility checklist","https://www.cs.mcgill.ca/~jpineau/ReproducibilityChecklist.pdf")],k:["Re-run one result with 3 seeds and report spread","Add a baseline that beats you on one metric and report it","Publish scripts so others can reproduce","Write one page: what your numbers do not prove"]},
+ {t:"Founder basics",how:"Talk to users first, build second.",r:[R("YC Startup School","https://www.startupschool.org/"),R("The Mom Test (book)","https://www.momtestbook.com/")],k:["Interview 5 potential users about GPU or inference cost pain","Write a 1-page problem/solution memo","Build a landing page and collect 20 sign-ups","Apply to a local incubator or accelerator"]}
+],m:"Milestone: one public preprint and one user-validated product idea."}
+];
+
+const KEY="journey-progress-v1";
+let done={};
+try{done=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}};
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const id=(p,l,k)=>`${p}.${l}.${k}`;
+
+function render(){
+  document.getElementById("phases").innerHTML=DATA.map((p,pi)=>`
+  <details class="phase" data-p="${pi}">
+    <summary><span class="num">${pi}</span><div><h2>${esc(p.t)}</h2><p class="why">${esc(p.why)}</p></div><span class="pct" id="pct${pi}"></span></summary>
+    <div class="bar"><i id="bar${pi}"></i></div>
+    <div class="body">${p.l.map((l,li)=>`
+      <div class="lesson"><h3>${pi}.${li+1} ${esc(l.t)}</h3>
+        <p class="how">${esc(l.how)}</p>
+        <p class="res">${l.r.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(n)}</a>`).join("")}</p>
+        <ul class="tasks">${l.k.map((k,ki)=>{const t=id(pi,li,ki);return `<li><label><input type="checkbox" data-id="${t}" ${done[t]?"checked":""}><span>${esc(k)}</span></label></li>`}).join("")}</ul>
+      </div>`).join("")}
+      <div class="milestone">${esc(p.m)}</div>
+    </div>
+  </details>`).join("");
+  update(true);
+}
+
+function update(openNext){
+  let all=0,got=0,next=null;
+  DATA.forEach((p,pi)=>{
+    let a=0,g=0;
+    p.l.forEach((l,li)=>l.k.forEach((k,ki)=>{a++;const t=id(pi,li,ki);if(done[t])g++;else if(!next)next={pi,li,k,l}}));
+    all+=a;got+=g;
+    document.getElementById("pct"+pi).textContent=`${g}/${a}`;
+    document.getElementById("bar"+pi).style.width=(100*g/a)+"%";
+  });
+  document.getElementById("total").textContent=`${got} / ${all} tasks · ${Math.round(100*got/all)}%`;
+  document.getElementById("totalbar").style.width=(100*got/all)+"%";
+  document.getElementById("next").innerHTML=next?`Next up: <b>${next.pi}.${next.li+1} ${esc(next.l.t)}</b> — ${esc(next.k)}`:"All tasks done. Go build.";
+  if(openNext&&next)document.querySelector(`details[data-p="${next.pi}"]`).open=true;
+}
+
+document.addEventListener("change",e=>{
+  const t=e.target.dataset&&e.target.dataset.id; if(!t)return;
+  if(e.target.checked)done[t]=Date.now(); else delete done[t];
+  save();update(false);
+});
+document.getElementById("exp").onclick=()=>{
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(done)],{type:"application/json"}));
+  a.download="journey-progress.json";a.click();
+};
+document.getElementById("imp").onclick=()=>document.getElementById("file").click();
+document.getElementById("file").onchange=async e=>{
+  const f=e.target.files[0]; if(!f)return;
+  try{const d=JSON.parse(await f.text()); if(typeof d!=="object"||Array.isArray(d))throw 0; done=d;save();render();}
+  catch(_){document.getElementById("next").textContent="Import failed: not a valid progress file."}
+};
+document.getElementById("rst").onclick=()=>{
+  const b=document.getElementById("rst");
+  if(b.dataset.arm){done={};save();render();b.textContent="Reset";delete b.dataset.arm}
+  else{b.dataset.arm=1;b.textContent="Click again to confirm";setTimeout(()=>{b.textContent="Reset";delete b.dataset.arm},3000)}
+};
+render();
+</script>
+</body>
+</html>
