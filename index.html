@@ -8,480 +8,213 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f6f5f1;--card:#fff;--soft:#f0efe9;--ink:#1c1c1a;--mute:#6b6a64;--line:#e4e2da;--acc:#2f6f4f;--acc-ink:#fff;--acc2:#e1eee5;--done:#9a9890;--bad:#b3261e;--shadow:0 1px 2px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.04)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121211;--card:#1b1b19;--soft:#232320;--ink:#ecebe6;--mute:#9a9890;--line:#2e2e2a;--acc:#6fbf8f;--acc-ink:#0f1a13;--acc2:#1f3327;--done:#6b6a64;--bad:#f2867c;--shadow:none}}
-:root[data-theme="dark"]{--bg:#121211;--card:#1b1b19;--soft:#232320;--ink:#ecebe6;--mute:#9a9890;--line:#2e2e2a;--acc:#6fbf8f;--acc-ink:#0f1a13;--acc2:#1f3327;--done:#6b6a64;--bad:#f2867c;--shadow:none}
+:root{--bg:#f6f5f1;--card:#fff;--soft:#f0efe9;--ink:#1c1c1a;--mute:#6b6a64;--line:#e4e2da;--acc:#2f6f4f;--acc-ink:#fff;--acc2:#e1eee5;--done:#9a9890;--bad:#b3261e;--bad2:#fbe9e7;--shadow:0 1px 2px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.04)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121211;--card:#1b1b19;--soft:#232320;--ink:#ecebe6;--mute:#9a9890;--line:#2e2e2a;--acc:#6fbf8f;--acc-ink:#0f1a13;--acc2:#1f3327;--done:#6b6a64;--bad:#f2867c;--bad2:#3a1f1c;--shadow:none}}
+:root[data-theme="dark"]{--bg:#121211;--card:#1b1b19;--soft:#232320;--ink:#ecebe6;--mute:#9a9890;--line:#2e2e2a;--acc:#6fbf8f;--acc-ink:#0f1a13;--acc2:#1f3327;--done:#6b6a64;--bad:#f2867c;--bad2:#3a1f1c;--shadow:none}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font:15.5px/1.6 Inter,system-ui,-apple-system,Segoe UI,sans-serif;-webkit-font-smoothing:antialiased}
-main{max-width:880px;margin:0 auto;padding:40px 16px 96px}
 a{color:var(--acc)}
-.eyebrow{font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);margin:0 0 8px}
-h1{font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.15;letter-spacing:-.02em;margin:0 0 10px}
-.sub{color:var(--mute);margin:0 0 28px;max-width:640px}
+.mono,code,pre{font-family:"JetBrains Mono",ui-monospace,Consolas,monospace}
+[hidden]{display:none!important}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
 .bar{height:6px;background:var(--soft);border-radius:99px;overflow:hidden}
-.bar>i{display:block;height:100%;background:var(--acc);width:0;border-radius:99px;transition:width .4s ease}
-button{font:inherit;font-size:.85rem;font-weight:500;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:7px 12px;cursor:pointer;transition:border-color .15s,background .15s}
-button:hover{border-color:var(--acc)}
+.bar>i{display:block;height:100%;background:var(--acc);border-radius:99px;transition:width .4s}
+button,.btn{font:inherit;font-size:.86rem;font-weight:500;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:border-color .15s,filter .15s}
+button:hover,.btn:hover{border-color:var(--acc)}
 button:disabled{opacity:.6;cursor:wait}
-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .btn-primary{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
 .btn-primary:hover{filter:brightness(1.08)}
 .btn-ghost{border-color:transparent;background:transparent;color:var(--mute)}
-input[type=email],select,textarea{font:inherit;font-size:.88rem;padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+input,textarea{font:inherit;font-size:.9rem;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
 
-/* Overview */
-.top{padding:20px;margin-bottom:8px}
-.stats{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center}
-.ring{--p:0;width:92px;height:92px;border-radius:50%;background:conic-gradient(var(--acc) calc(var(--p)*1%),var(--soft) 0);display:grid;place-items:center;transition:background .4s}
+/* Top bar */
+.topbar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.topbar .in{max-width:1240px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:16px}
+.brand{font-weight:700;color:var(--ink);text-decoration:none;letter-spacing:-.01em}
+.brand span{color:var(--acc)}
+.tprog{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:.8rem;color:var(--mute);font-variant-numeric:tabular-nums}
+.tprog .bar{width:120px}
+
+/* Home */
+.home{max-width:880px;margin:0 auto;padding:36px 16px 96px}
+.eyebrow{font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);margin:0 0 8px}
+h1{font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.15;letter-spacing:-.02em;margin:0 0 10px}
+.sub{color:var(--mute);margin:0 0 28px;max-width:660px}
+.top{padding:20px}
+.stats{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.ring{width:92px;height:92px;border-radius:50%;background:conic-gradient(var(--acc) calc(var(--p)*1%),var(--soft) 0);display:grid;place-items:center;flex:none}
 .ring span{width:74px;height:74px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-weight:700;font-size:1.25rem;font-variant-numeric:tabular-nums}
-.nums{display:flex;flex-wrap:wrap;gap:8px 28px}
-.nums div{min-width:90px}
+.nums{display:flex;flex-wrap:wrap;gap:8px 32px}
 .nums b{display:block;font-size:1.15rem;font-variant-numeric:tabular-nums}
 .nums small{color:var(--mute);font-size:.8rem}
-.next{display:flex;gap:12px;align-items:baseline;margin-top:18px;padding:12px 14px;border-radius:12px;background:var(--acc2);color:var(--ink);text-decoration:none;font-size:.92rem}
-.next:hover{filter:brightness(.98)}
-.next .tag{flex:none;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--acc)}
+.continue{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:18px 0 0;padding:14px 16px;border-radius:12px;background:var(--acc);color:var(--acc-ink);text-decoration:none}
+.continue small{display:block;font-size:.75rem;opacity:.85;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.continue .go{font-size:1.3rem}
+.continue:hover{filter:brightness(1.08)}
 .auth{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;font-size:.88rem;color:var(--mute)}
 .auth .ctl{display:flex;gap:8px;flex-wrap:wrap}
-.auth .ctl[hidden],[hidden]{display:none!important}
 .auth input{width:220px;max-width:100%}
-@media (max-width:520px){.stats{grid-template-columns:1fr;justify-items:start}}
-
-/* Sections */
 .section-h{display:flex;align-items:baseline;justify-content:space-between;margin:32px 4px 12px}
 .section-h h2{font-size:.8rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:0}
 .section-h span{font-size:.8rem;color:var(--mute)}
-
-/* Phase cards */
-details.phase{margin-bottom:12px;overflow:hidden;transition:border-color .2s}
+.foot{margin-top:32px;text-align:center}
+details.phase{margin-bottom:12px;overflow:hidden}
 details.phase.current{border-color:var(--acc)}
 details.phase>summary{cursor:pointer;padding:16px 18px;list-style:none;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center}
-details.phase>summary::-webkit-details-marker{display:none}
-.num{width:38px;height:38px;border-radius:12px;background:var(--soft);color:var(--mute);display:grid;place-items:center;font-weight:700;font-size:.95rem}
+summary::-webkit-details-marker{display:none}
+summary{list-style:none}
+.num{width:38px;height:38px;border-radius:12px;background:var(--soft);color:var(--mute);display:grid;place-items:center;font-weight:700}
 .current .num{background:var(--acc);color:var(--acc-ink)}
 .complete .num{background:var(--acc2);color:var(--acc)}
-.phase h3{font-size:1.02rem;font-weight:600;margin:0;letter-spacing:-.01em}
+.phase h3{font-size:1.02rem;font-weight:600;margin:0}
+.complete h3{color:var(--mute)}
 .phase .why{color:var(--mute);font-size:.88rem;margin:2px 0 8px}
 .phase summary .bar{max-width:260px}
-.side{display:flex;align-items:center;gap:10px}
-.chip{font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--soft);color:var(--mute);white-space:nowrap;font-variant-numeric:tabular-nums}
+.side-r{display:flex;align-items:center;gap:10px}
+.chip{font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--soft);color:var(--mute);white-space:nowrap}
 .current .chip,.complete .chip{background:var(--acc2);color:var(--acc)}
 .chev{width:9px;height:9px;border-right:2px solid var(--mute);border-bottom:2px solid var(--mute);transform:rotate(45deg);transition:transform .2s;margin:0 4px 4px}
 details[open]>summary .chev{transform:rotate(225deg);margin:4px 4px 0}
-.complete h3{color:var(--mute)}
-.body{padding:0 18px 18px}
-.lesson{border-top:1px solid var(--line);padding:16px 0}
-.lesson-h{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
-.lesson h4{font-size:.98rem;font-weight:600;margin:0 0 4px}
-.lesson-h small{color:var(--mute);font-size:.78rem;font-variant-numeric:tabular-nums;white-space:nowrap}
-.how{color:var(--mute);font-size:.9rem;margin:0 0 10px}
-.res{margin:0 0 10px;display:flex;flex-wrap:wrap;gap:6px}
-.res a{font-size:.8rem;text-decoration:none;padding:3px 10px;border:1px solid var(--line);border-radius:99px;color:var(--ink);background:var(--bg)}
+.lrows{list-style:none;margin:0;padding:0 10px 8px}
+.lrows a{display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:10px;text-decoration:none;color:var(--ink);font-size:.93rem}
+.lrows a:hover{background:var(--soft)}
+.lrows .lt{flex:1}
+.lrows .lm{font-size:.78rem;color:var(--mute);font-variant-numeric:tabular-nums;white-space:nowrap}
+.milestone{margin:6px 18px 18px;padding:12px 14px;border-radius:12px;background:var(--acc2);font-size:.9rem}
+.milestone::before{content:"★ ";color:var(--acc)}
+
+/* Status icons */
+.ic{flex:none;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--mute);display:inline-grid;place-items:center}
+.ic.half{border-color:var(--acc);background:conic-gradient(var(--acc) 50%,transparent 0)}
+.ic.done{border-color:var(--acc);background:var(--acc)}
+.ic.done::after{content:"";width:4px;height:7px;border-right:2px solid var(--acc-ink);border-bottom:2px solid var(--acc-ink);transform:rotate(45deg);margin-top:-2px}
+
+/* Lesson layout */
+.layout{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:300px 1fr;min-height:calc(100vh - 50px)}
+.sidebar{position:sticky;top:50px;height:calc(100vh - 50px);overflow:auto;border-right:1px solid var(--line);padding:16px 10px 40px}
+.side-h{font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:14px 8px 8px}
+.sg>summary{cursor:pointer;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px;border-radius:10px;font-size:.88rem;font-weight:600}
+.sg>summary:hover{background:var(--soft)}
+.snum{width:24px;height:24px;border-radius:8px;background:var(--soft);display:grid;place-items:center;font-size:.75rem;color:var(--mute)}
+.sg.complete .snum{background:var(--acc2);color:var(--acc)}
+.sg.complete .st{color:var(--mute)}
+.sc{font-size:.72rem;color:var(--mute);font-weight:500;font-variant-numeric:tabular-nums}
+.sg ul{list-style:none;margin:0 0 6px;padding:0}
+.sg li a{display:flex;gap:10px;align-items:center;padding:7px 8px 7px 16px;border-radius:8px;text-decoration:none;color:var(--ink);font-size:.86rem;line-height:1.35}
+.sg li a:hover{background:var(--soft)}
+.sg li a.cur{background:var(--acc2);font-weight:600}
+.main{padding:24px 32px 96px;min-width:0;max-width:860px}
+.crumbs{display:flex;gap:8px;align-items:center;font-size:.82rem;color:var(--mute);margin-bottom:12px;flex-wrap:wrap}
+.crumbs a{color:var(--mute)}
+.menu{display:none;padding:5px 10px}
+.lh{font-size:clamp(1.4rem,3vw,1.9rem)}
+.meta{color:var(--mute);font-size:.88rem;margin:0 0 18px}
+.stepper{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.stepper a{display:flex;align-items:center;gap:8px;padding:8px 14px 8px 8px;border-radius:99px;border:1px solid var(--line);background:var(--card);text-decoration:none;color:var(--mute);font-size:.86rem;font-weight:500}
+.stepper .dot{width:22px;height:22px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-size:.72rem;font-weight:700}
+.stepper a.ok .dot{background:var(--acc2);color:var(--acc)}
+.stepper a.on{border-color:var(--acc);color:var(--ink)}
+.stepper a.on .dot{background:var(--acc);color:var(--acc-ink)}
+.panel{padding:24px 28px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:18px;flex-wrap:wrap}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{position:fixed;inset:50px auto 0 0;width:min(320px,88vw);z-index:15;background:var(--bg);transform:translateX(-100%);transition:transform .2s;height:auto}
+  body.side-open .sidebar{transform:none;box-shadow:0 0 0 100vmax rgba(0,0,0,.35)}
+  .menu{display:inline-flex}
+  .main{padding:18px 16px 80px}
+  .panel{padding:18px 16px}
+}
+
+/* Lesson text */
+.prose{font-size:.98rem}
+.prose h3{font-size:1.08rem;margin:26px 0 8px;letter-spacing:-.01em}
+.prose h3:first-child{margin-top:0}
+.prose p,.prose ul,.prose ol{margin:0 0 12px}
+.prose li{margin:4px 0}
+.prose code{font-size:.86em;background:var(--soft);padding:1px 5px;border-radius:5px}
+.prose pre{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:12px 14px;overflow:auto;font-size:.84rem;line-height:1.55}
+.prose pre code{background:none;padding:0;font-size:inherit}
+.prose blockquote{margin:16px 0;padding:10px 14px;border-left:3px solid var(--acc);background:var(--acc2);border-radius:0 10px 10px 0}
+.prose table{border-collapse:collapse;margin:0 0 14px;font-size:.9rem;display:block;overflow:auto}
+.prose th,.prose td{border:1px solid var(--line);padding:6px 10px;text-align:left}
+.muted{color:var(--mute)}
+.res{margin:16px 0 10px;display:flex;flex-wrap:wrap;gap:6px}
+.res a{font-size:.8rem;text-decoration:none;padding:4px 10px;border:1px solid var(--line);border-radius:99px;color:var(--ink);background:var(--bg)}
 .res a:hover{border-color:var(--acc);color:var(--acc)}
 .res a::after{content:" ↗";color:var(--mute)}
-ul.tasks{list-style:none;margin:0;padding:0}
-ul.tasks label{display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:7px 8px;margin:0 -8px;border-radius:10px;font-size:.93rem}
+
+/* Practice */
+.banner{padding:10px 14px;border-radius:10px;margin-bottom:16px;font-weight:600;font-size:.9rem}
+.banner.ok{background:var(--acc2);color:var(--acc)}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:16px 0 8px}
+.grow{flex:1}
+.langtag{font-size:.75rem;font-weight:600;color:var(--mute);background:var(--soft);padding:4px 10px;border-radius:99px}
+#code{width:100%;min-height:280px;padding:14px;background:var(--soft);font-size:13px;line-height:1.55;tab-size:4;resize:vertical}
+.stdin{display:grid;gap:4px;margin-top:10px;font-size:.78rem;font-weight:500;color:var(--mute)}
+.stdin textarea{width:100%;font-size:13px;resize:vertical}
+.outwrap{margin-top:12px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.outwrap .h{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 12px;background:var(--soft);font-size:.75rem;color:var(--mute);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+#verdict{text-transform:none;letter-spacing:0;font-size:.85rem}
+.ok{color:var(--acc)}.bad{color:var(--bad)}
+#runout{margin:0;padding:12px;font-size:13px;white-space:pre-wrap;word-break:break-word;max-height:360px;overflow:auto}
+details.hint{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:0 12px}
+details.hint summary{cursor:pointer;padding:10px 0;font-size:.88rem;font-weight:500;color:var(--mute)}
+details.hint pre{background:var(--soft);padding:12px;border-radius:8px;overflow:auto;font-size:13px}
+.fill{padding-left:20px}
+.fill li{margin-bottom:16px}
+.fill label{display:block;margin-bottom:6px;font-size:.95rem}
+.frow{display:flex;gap:10px;align-items:center}
+.frow input{flex:1;max-width:420px;font-size:.9rem}
+.fres{font-weight:700;width:16px}
+.fhint{font-size:.85rem;color:var(--mute);margin-top:4px}
+
+/* Quiz */
+.quiz{padding-left:20px}
+.quiz>li{margin-bottom:22px}
+.qq{font-weight:600;margin:0 0 8px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;cursor:pointer;font-size:.93rem}
+.opt:hover{border-color:var(--acc)}
+.opt input{margin-top:4px;accent-color:var(--acc)}
+.opt.right{border-color:var(--acc);background:var(--acc2)}
+.opt.wrong{border-color:var(--bad);background:var(--bad2)}
+.quiz .why{font-size:.88rem;margin:6px 0 0}
+#qscore{font-weight:600;font-size:.9rem}
+
+/* Tasks */
+ul.tasks{list-style:none;margin:8px 0 0;padding:0}
+ul.tasks label{display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:8px;margin:0 -8px;border-radius:10px;font-size:.95rem}
 ul.tasks label:hover{background:var(--soft)}
-ul.tasks input{appearance:none;-webkit-appearance:none;flex:none;width:18px;height:18px;margin:3px 0 0;border:1.5px solid var(--mute);border-radius:6px;display:grid;place-items:center;cursor:pointer;transition:background .15s,border-color .15s}
+ul.tasks input{appearance:none;-webkit-appearance:none;flex:none;width:18px;height:18px;margin:3px 0 0;padding:0;border:1.5px solid var(--mute);border-radius:6px;display:grid;place-items:center;cursor:pointer;background:transparent}
 ul.tasks input::after{content:"";width:5px;height:9px;border-right:2px solid var(--acc-ink);border-bottom:2px solid var(--acc-ink);transform:rotate(45deg) scale(0);margin-top:-2px;transition:transform .15s}
 ul.tasks input:checked{background:var(--acc);border-color:var(--acc)}
 ul.tasks input:checked::after{transform:rotate(45deg) scale(1)}
 ul.tasks input:checked+span{color:var(--done);text-decoration:line-through}
-.milestone{margin-top:6px;padding:12px 14px;border-radius:12px;background:var(--acc2);font-size:.9rem}
-.milestone::before{content:"★ ";color:var(--acc)}
-
-/* Playground */
-.mono{font:13px/1.55 "JetBrains Mono",ui-monospace,Consolas,monospace}
-#play{margin-top:20px}
-#play .num{font-size:.7rem;color:var(--acc)}
-.pg-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-.pg-row select{flex:1 1 220px;max-width:100%}
-#play textarea{width:100%;padding:12px;resize:vertical;tab-size:4}
-#code{background:var(--soft);min-height:240px}
-.pg-io{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.pg-io label{font-size:.78rem;font-weight:500;color:var(--mute);display:grid;gap:4px}
-@media (max-width:560px){.pg-io{grid-template-columns:1fr}}
-.outwrap{margin-top:12px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
-.outwrap .h{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 12px;background:var(--soft);font-size:.75rem;color:var(--mute);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
-#verdict{text-transform:none;letter-spacing:0;font-size:.82rem}
-#verdict.ok{color:var(--acc)}#verdict.bad{color:var(--bad)}
-#runout{margin:0;padding:12px;background:var(--bg);white-space:pre-wrap;word-break:break-word;max-height:360px;overflow:auto}
+.panel .milestone{margin:16px 0 0}
 </style>
 </head>
 <body>
-<main>
-<p class="eyebrow">Learning path</p>
-<h1>From Pixels to GPU-Native AI</h1>
-<p class="sub">Built from the skill set in Rameel Malik's profile: graphics, C++/CUDA, deep learning, medical 3-D vision, transformers, LLM serving and agents. Phases follow dependency order. Each task takes 15–60 minutes.</p>
-
-<section class="top card">
-  <div class="stats">
-    <div class="ring" id="ring"><span id="pctbig">0%</span></div>
-    <div>
-      <div class="nums">
-        <div><b id="ntasks">0 / 0</b><small>tasks done</small></div>
-        <div><b id="nlessons">0 / 0</b><small>lessons complete</small></div>
-        <div><b id="nphases">0 / 0</b><small>phases complete</small></div>
-      </div>
-      <div class="bar" style="margin-top:12px"><i id="totalbar"></i></div>
-    </div>
-  </div>
-  <a class="next" id="next" href="#phases"></a>
-  <form class="auth" id="auth">
-    <span id="who">Not signed in. Progress is saved only in this browser.</span>
-    <span class="ctl" id="authctl"><input type="email" id="email" placeholder="you@example.com" required aria-label="Email"><button class="btn-primary">Send login link</button></span>
-    <span class="ctl"><button type="button" id="signout" hidden>Sign out</button><button type="button" id="rst" class="btn-ghost">Reset progress</button></span>
-  </form>
-</section>
-
-<details class="phase card" id="play">
-  <summary><span class="num">&lt;/&gt;</span><div><h3>Code playground</h3><p class="why" style="margin-bottom:0">Run Python, C++, Rust, CUDA or SQL. Add expected output to check your answer.</p></div><span class="side"><span class="chip">Ctrl+Enter</span><span class="chev"></span></span></summary>
-  <div class="body">
-    <div class="pg-row">
-      <select id="lang" aria-label="Language">
-        <option value="python">Python 3 (in browser, numpy OK)</option>
-        <option value="cpp">C++20 (gcc 14.2)</option>
-        <option value="rust">Rust (rustc 1.99)</option>
-        <option value="cuda">CUDA (nvcc, no GPU: host code runs, kernels do not)</option>
-        <option value="sql">SQL (SQLite, in browser)</option>
-      </select>
-      <button id="resetcode" type="button">Reset code</button>
-      <button id="runbtn" class="btn-primary">Run ▶</button>
-    </div>
-    <textarea id="code" class="mono" spellcheck="false" aria-label="Code" rows="14"></textarea>
-    <div class="pg-io">
-      <label>stdin<textarea id="stdin" class="mono" rows="3" spellcheck="false"></textarea></label>
-      <label>Expected output (optional)<textarea id="expect" class="mono" rows="3" spellcheck="false"></textarea></label>
-    </div>
-    <div class="outwrap"><div class="h"><span>Output</span><span id="verdict"></span></div><pre id="runout" class="mono">Output appears here.</pre></div>
-  </div>
-</details>
-
-<div class="section-h"><h2>Roadmap</h2><span id="remain"></span></div>
-<div id="phases"></div>
-<div class="section-h" id="completed-h" hidden><h2>Completed</h2><span id="donecount"></span></div>
-<div id="completed"></div>
-</main>
-
+<header class="topbar"><div class="in">
+  <a class="brand" href="#/">GPU<span>→</span>AI Journey</a>
+  <div class="tprog"><span id="toppct">0%</span><div class="bar" id="topbar"><i></i></div></div>
+</div></header>
+<div id="app"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script>
-// Supabase project settings (Project Settings > API). The anon key is public by design; RLS protects data.
-const SUPABASE_URL="https://ktqpfofzgvnmvwynvbce.supabase.co";
-const SUPABASE_ANON_KEY="sb_publishable_QvRKnCh6Ez3Kl5r5nDzjWg_rPDbGoeC";
-const R=(n,u)=>[n,u];
-const DATA=[
-{t:"Foundations",why:"Tools and math every later phase assumes.",l:[
- {t:"Linux shell & Git",how:"Do all work in a terminal from day one. Learn by using, not reading.",r:[R("MIT Missing Semester","https://missing.csail.mit.edu/"),R("Pro Git book","https://git-scm.com/book")],k:["Install WSL2 (Ubuntu) or use native Linux","Navigate, grep, pipe and redirect: finish Missing Semester lecture 1–2 exercises","Create a GitHub repo 'learning-log' and commit a README","Make a branch, change a file, merge it, resolve one deliberate conflict","Write a 10-line bash script that backs up a folder with a timestamp"]},
- {t:"Python fluently",how:"Write small scripts daily. Focus on data structures, files, virtualenvs and NumPy.",r:[R("Python tutorial","https://docs.python.org/3/tutorial/"),R("NumPy quickstart","https://numpy.org/doc/stable/user/quickstart.html")],k:["Create a venv and install numpy, matplotlib, jupyter","Solve 5 easy problems with lists, dicts and comprehensions","Read a CSV, compute mean/std per column without pandas","Rewrite that with NumPy vectorized ops and time both","Plot a histogram with matplotlib and save it as PNG"]},
- {t:"Linear algebra",how:"Watch for intuition, then compute by hand and verify in NumPy.",r:[R("3Blue1Brown: Essence of Linear Algebra","https://www.3blue1brown.com/topics/linear-algebra"),R("Mathematics for ML (free book)","https://mml-book.github.io/")],k:["Watch chapters 1–4; multiply two 2×2 matrices by hand, check in NumPy","Implement matrix multiply with triple loop; compare to np.matmul speed","Rotate a set of 2-D points with a rotation matrix and plot before/after","Compute eigenvalues of a 2×2 by hand; verify with np.linalg.eig","Explain in 3 sentences in your log what a dot product measures"]},
- {t:"Calculus & probability for ML",how:"Only the parts ML uses: derivatives, chain rule, gradients, distributions, expectation.",r:[R("3Blue1Brown: Essence of Calculus","https://www.3blue1brown.com/topics/calculus"),R("Seeing Theory (probability)","https://seeing-theory.brown.edu/")],k:["Differentiate f(x)=x²·sin(x) by hand; check numerically with finite differences","Implement gradient descent to minimise (x−3)² in 15 lines","Simulate 10,000 dice rolls; plot distribution of the sum of two dice","Compute mean, variance, and a 95% interval for a sample","Write down Bayes' rule and solve one medical-test example"]}
-],m:"Milestone: learning-log repo with scripts, notebooks and notes for all four lessons."},
-
-{t:"C++ & build systems",why:"Engines, CUDA hosts and runtimes are C++.",l:[
- {t:"Modern C++ core",how:"Follow learncpp in order; type every example; compile with warnings on.",r:[R("learncpp.com","https://www.learncpp.com/"),R("cppreference","https://en.cppreference.com/")],k:["Compile hello world with g++ -Wall -Wextra -std=c++20","Write a function overloading exercise and a struct with methods","Use std::vector, std::string, std::unordered_map in a word-count program","Implement a tiny class with constructor, destructor, copy and move","Replace raw new/delete with std::unique_ptr in that class"]},
- {t:"Memory & performance",how:"Learn how data layout affects speed. Measure everything.",r:[R("What every programmer should know about memory","https://people.freebsd.org/~lstewart/articles/cpumemory.pdf"),R("Compiler Explorer","https://godbolt.org/")],k:["Time summing a 2-D array row-major vs column-major; log the ratio","Compare array-of-structs vs struct-of-arrays for a particle update","Look at -O0 vs -O2 assembly for a loop in Compiler Explorer","Run a program under valgrind or AddressSanitizer and fix one bug","Write a simple arena allocator and benchmark against new"]},
- {t:"CMake",how:"Every C++ project from now on uses CMake.",r:[R("CMake tutorial","https://cmake.org/cmake/help/latest/guide/tutorial/index.html"),R("Modern CMake","https://cliutils.gitlab.io/modern-cmake/")],k:["Build hello world with a minimal CMakeLists.txt","Split code into a library target and an executable target","Add a third-party lib with FetchContent (e.g. fmt)","Add Debug/Release configs; compare binary speed","Add a test with CTest and run it"]},
- {t:"Rust basics",how:"Needed later for the inference runtime. Read the Book chapters 1–10 and do rustlings.",r:[R("The Rust Book","https://doc.rust-lang.org/book/"),R("Rustlings","https://github.com/rust-lang/rustlings")],k:["Install rustup; build hello world with cargo","Finish rustlings: variables, functions, ownership, structs","Write a CLI that counts words in a file using std only","Handle errors with Result and the ? operator","Call a C function from Rust via FFI (extern \"C\")"]}
-],m:"Milestone: a CMake C++ project and a Cargo Rust CLI, both in the log repo with benchmark notes."},
-
-{t:"Visual design & CGI",why:"The profile's start: design eye, posters, 3-D art.",l:[
- {t:"Design fundamentals",how:"Study one principle, then make one poster using only that principle.",r:[R("Canva Design School (free)","https://www.canva.com/designschool/"),R("Figma learn","https://help.figma.com/hc/en-us/categories/360002051613")],k:["Learn hierarchy, contrast, alignment, proximity; write one line on each","Recreate a poster you like in Figma, pixel for pixel","Design an event poster with a strict 2-font, 3-colour limit","Get feedback from 2 people; make one revision","Publish both versions to a Behance or portfolio page"]},
- {t:"Blender & CGI",how:"Follow a beginner series end to end; then make one original render.",r:[R("Blender Guru donut series","https://www.youtube.com/@blenderguru"),R("Blender manual","https://docs.blender.org/manual/en/latest/")],k:["Install Blender; learn navigation and move/rotate/scale shortcuts","Model a simple object with modifiers (subdivision, bevel)","Add materials and 3-point lighting; render with Cycles","Animate a camera move and render 5 s of video","Make one original CGI poster for an imaginary tech event"]}
-],m:"Milestone: portfolio with 3 posters and 1 CGI render."},
-
-{t:"Real-time graphics",why:"Graphics is how you learn the GPU: pipelines, buffers, shaders.",l:[
- {t:"OpenGL",how:"Work through LearnOpenGL Getting Started and Lighting, in C++ with CMake.",r:[R("LearnOpenGL","https://learnopengl.com/"),R("The Book of Shaders","https://thebookofshaders.com/")],k:["Open a window with GLFW and clear it to a colour","Draw a triangle with a VBO, VAO and your own shaders","Add textures and a transform matrix (GLM)","Build a fly-through camera","Implement Phong lighting on a cube","Load an .obj model and render it"]},
- {t:"Rendering techniques",how:"Pick techniques that teach GPU memory: framebuffers, instancing, compute.",r:[R("LearnOpenGL Advanced","https://learnopengl.com/Advanced-OpenGL/Depth-testing"),R("Real-Time Rendering resources","https://www.realtimerendering.com/")],k:["Render to a framebuffer and apply a post-process blur","Draw 100,000 cubes with instancing; record FPS","Write a compute shader that updates particle positions","Profile one frame with RenderDoc and note the slowest draw","Write a short blog note: what costs time on the GPU"]},
- {t:"Vulkan",how:"Explicit GPU control. Slow and verbose on purpose; finish the triangle and buffers chapters.",r:[R("vulkan-tutorial.com","https://vulkan-tutorial.com/"),R("Vulkan Guide","https://vkguide.dev/")],k:["Install the Vulkan SDK; run vkcube","Create instance, device and swapchain; enable validation layers","Draw the triangle","Add vertex and uniform buffers with staging","Write in your log 5 things OpenGL did for you that Vulkan makes you do"]}
-],m:"Milestone: a small OpenGL scene viewer and a Vulkan triangle-with-buffers app."},
-
-{t:"GPU programming with CUDA",why:"Core skill: kernels, memory, profiling.",l:[
- {t:"CUDA basics",how:"Read the programming guide sections 1–5 and PMPP chapters 1–5 while coding each example.",r:[R("CUDA C++ Programming Guide","https://docs.nvidia.com/cuda/cuda-c-programming-guide/"),R("Programming Massively Parallel Processors (book)","https://www.elsevier.com/books/programming-massively-parallel-processors/hwu/978-0-323-91231-0")],k:["Install CUDA toolkit (or use free Colab/Kaggle GPU); compile with nvcc","Write vector add; check results against CPU","Experiment with block sizes 64–1024; log timings","Write a 2-D kernel: grayscale conversion of an image","Add error checking macro for every CUDA call"]},
- {t:"Memory hierarchy",how:"Speed in CUDA is mostly memory. Implement, measure, improve.",r:[R("NVIDIA blog: How to access global memory efficiently","https://developer.nvidia.com/blog/how-access-global-memory-efficiently-cuda-c-kernels/"),R("Simon Boehm: CUDA matmul worklog","https://siboehm.com/articles/22/CUDA-MMM")],k:["Write a naive matrix multiply kernel; measure GFLOPS","Add shared-memory tiling; measure again","Demonstrate coalesced vs strided access with a benchmark","Implement a parallel reduction (sum) with warp shuffles","Use pinned memory and streams to overlap copy and compute"]},
- {t:"Libraries & profiling",how:"Use Thrust/cuBLAS when they fit; profile with Nsight.",r:[R("Thrust docs","https://nvidia.github.io/cccl/thrust/"),R("Nsight Compute","https://developer.nvidia.com/nsight-compute")],k:["Sort 10M keys with thrust::sort; compare to std::sort","Build a CSR adjacency from an edge list with sort + binary search","Compare your matmul to cuBLAS","Profile one kernel in Nsight Compute; read occupancy and memory throughput","Fix the top bottleneck Nsight shows and log the speedup"]},
- {t:"CUDA + graphics interop",how:"Connect CUDA output to OpenGL to visualise results in real time.",r:[R("CUDA graphics interop","https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__OPENGL.html")],k:["Register an OpenGL buffer with CUDA","Update vertex positions in a CUDA kernel each frame","Render a CUDA-simulated wave surface","Measure frame time with and without interop copy"]}
-],m:"Milestone: CUDA kernels repo with a benchmark table (naive vs tiled vs cuBLAS) and Nsight screenshots."},
-
-{t:"Machine learning foundations",why:"Concepts before deep learning: data splits, metrics, overfitting.",l:[
- {t:"Classical ML with scikit-learn",how:"Learn by fitting models on small public datasets.",r:[R("scikit-learn tutorials","https://scikit-learn.org/stable/tutorial/index.html"),R("Kaggle Learn: Intro to ML","https://www.kaggle.com/learn/intro-to-machine-learning")],k:["Train a logistic regression on the breast-cancer dataset","Do train/val/test split and k-fold cross-validation","Compute accuracy, precision, recall, F1, ROC-AUC","Compare a random forest and SVM; tune with GridSearchCV","Show overfitting with a learning curve plot"]},
- {t:"SQL & data handling",how:"Data lives in tables. Learn enough SQL to query experiment results.",r:[R("SQLBolt","https://sqlbolt.com/"),R("SQLite docs","https://www.sqlite.org/docs.html")],k:["Finish SQLBolt lessons 1–12","Store experiment runs in SQLite from Python","Query best run per model with GROUP BY","Join a runs table with a configs table"]},
- {t:"MATLAB basics (optional)",how:"Common in engineering courses and imaging labs.",r:[R("MATLAB Onramp (free)","https://matlabacademy.mathworks.com/")],k:["Finish MATLAB Onramp","Load an image and apply a filter","Port one NumPy script to MATLAB"]}
-],m:"Milestone: notebook comparing 3 classifiers with proper metrics and cross-validation."},
-
-{t:"Deep learning with PyTorch",why:"Model work: CNNs, ResNet, EfficientNet, detection.",l:[
- {t:"Neural nets from scratch",how:"Build backprop yourself once, so PyTorch is no mystery.",r:[R("Karpathy: Neural Networks Zero to Hero","https://karpathy.ai/zero-to-hero.html"),R("Dive into Deep Learning","https://d2l.ai/")],k:["Watch micrograd video and build micrograd yourself","Train a 2-layer MLP on a toy dataset with your autograd","Rebuild it in PyTorch; compare gradients","Implement softmax + cross-entropy and check vs F.cross_entropy"]},
- {t:"PyTorch training loops",how:"Write the loop by hand every time until it is automatic.",r:[R("PyTorch tutorials","https://pytorch.org/tutorials/"),R("fast.ai course","https://course.fast.ai/")],k:["Train an MLP on MNIST with Dataset/DataLoader","Add validation, early stopping and checkpoint saving","Use mixed precision (torch.autocast) and compare speed","Log metrics to TensorBoard","Profile one epoch with torch.profiler"]},
- {t:"CNNs: ResNet & EfficientNet",how:"Read the papers' key ideas, implement small versions, then fine-tune pretrained ones.",r:[R("CS231n notes","https://cs231n.github.io/"),R("ResNet paper","https://arxiv.org/abs/1512.03385"),R("EfficientNet paper","https://arxiv.org/abs/1905.11946")],k:["Implement a small CNN for CIFAR-10; reach 70%+","Implement a residual block and a ResNet-18","Fine-tune pretrained ResNet-50 from torchvision on a small dataset","Fine-tune EfficientNet-B0 and compare accuracy/params/speed","Plot a confusion matrix and inspect 10 errors"]},
- {t:"Object detection: Faster R-CNN",how:"Follow the torchvision detection tutorial, then train on your own labels.",r:[R("TorchVision detection tutorial","https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html"),R("Faster R-CNN paper","https://arxiv.org/abs/1506.01497")],k:["Explain anchors, RPN and RoI pooling in your log","Run pretrained fasterrcnn_resnet50_fpn on 5 images","Fine-tune it on the PennFudan dataset","Compute mAP and recall at IoU 0.5","Label 50 images of your own and train a detector"]}
-],m:"Milestone: a fine-tuned detector and a classifier, each with an honest evaluation report."},
-
-{t:"Medical imaging & 3-D vision",why:"DICOM in, 3-D mesh out: the final-year-project skill set.",l:[
- {t:"OpenCV",how:"Image processing basics in Python, then C++.",r:[R("OpenCV tutorials","https://docs.opencv.org/4.x/d9/df8/tutorial_root.html")],k:["Load, resize, blur and threshold an image","Find contours and draw bounding boxes","Do edge detection and morphological ops","Rewrite one pipeline in C++ with CMake","Run a webcam loop at 30 FPS with a filter applied"]},
- {t:"DICOM & CT basics",how:"Understand Hounsfield units, slices, spacing and orientation before any ML.",r:[R("pydicom docs","https://pydicom.github.io/pydicom/stable/"),R("TCIA Lung-PET-CT-Dx","https://www.cancerimagingarchive.net/collection/lung-pet-ct-dx/")],k:["Download a small CT study from TCIA","Read DICOM headers with pydicom; print spacing and slice thickness","Convert pixels to Hounsfield units and window for lung (−1000 to 400)","Stack slices into a 3-D NumPy volume in correct order","Show axial, coronal, sagittal views side by side"]},
- {t:"SimpleITK & VTK",how:"Use proper medical-imaging libraries for resampling, segmentation and 3-D display.",r:[R("SimpleITK notebooks","https://simpleitk.org/SimpleITK-Notebooks/"),R("VTK examples","https://examples.vtk.org/site/")],k:["Load a DICOM series with SimpleITK","Resample to isotropic 1 mm spacing","Segment lungs with thresholding + connected components","Extract a surface with marching cubes (VTK or scikit-image)","Render the mesh in VTK and save as .stl/.ply"]},
- {t:"GPU 3-D reconstruction",how:"Move the mesh pipeline to CUDA and keep memory bounded.",r:[R("Marching cubes (Paul Bourke)","https://paulbourke.net/geometry/polygonise/"),R("Laplacian smoothing overview","https://en.wikipedia.org/wiki/Laplacian_smoothing")],k:["Implement marching cubes in CUDA for a 256³ volume","Build vertex adjacency (CSR) on GPU with Thrust","Implement Laplacian smoothing kernel; compare CPU timing","Process volumes in chunks so peak GPU memory stays under a fixed budget","Design a simple binary mesh format and write a loader"]},
- {t:"End-to-end screening pipeline",how:"Combine detection, classification and 3-D view with subject-disjoint evaluation.",r:[R("Faster R-CNN tutorial (reuse)","https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html")],k:["Split data by patient, never by slice","Train a nodule detector on 2-D slices","Train a subtype classifier on cropped detections","Report accuracy, recall and F1 per class with confidence intervals","Show detections inside the 3-D mesh viewer"]}
-],m:"Milestone: DICOM-to-mesh tool with a detection model and a short write-up of results and limits."},
-
-{t:"Transformers & LLMs",why:"Architecture design: attention variants, long context, training small models.",l:[
- {t:"Attention from scratch",how:"Code GPT from zero, then read the paper.",r:[R("Karpathy: Let's build GPT","https://www.youtube.com/watch?v=kCc8FmEb1nY"),R("Attention Is All You Need","https://arxiv.org/abs/1706.03762"),R("The Illustrated Transformer","https://jalammar.github.io/illustrated-transformer/")],k:["Implement scaled dot-product attention in NumPy","Add causal mask and multi-head attention in PyTorch","Train a char-level GPT on a small text corpus","Implement a BPE tokenizer (follow minbpe)","Plot attention maps for one sample"]},
- {t:"Modern architecture choices",how:"Read one paper per variant and implement the core idea in your GPT.",r:[R("GQA paper","https://arxiv.org/abs/2305.13245"),R("RoPE paper","https://arxiv.org/abs/2104.09864"),R("DeepSeek-V2 (MLA)","https://arxiv.org/abs/2405.04434")],k:["Replace learned positions with RoPE","Add RMSNorm and SwiGLU","Implement grouped-query attention; measure KV-cache size","Implement a simplified MLA (latent KV compression)","Compare variants at equal params and tokens; use 3 seeds"]},
- {t:"Long context & sparse attention",how:"Learn why attention is O(n²) and how to avoid it.",r:[R("FlashAttention paper","https://arxiv.org/abs/2205.14135"),R("Longformer paper","https://arxiv.org/abs/2004.05150")],k:["Measure memory and time of attention at 1K, 4K, 16K tokens","Implement sliding-window attention","Add a few global tokens (Longformer style)","Build a retrieval-copy test: model must copy a token from far back","Report exact-match accuracy vs context length"]},
- {t:"Train a small LM properly",how:"Matched experiments, held-out evaluation, reproducible configs.",r:[R("nanoGPT","https://github.com/karpathy/nanoGPT"),R("Stanford CS336","https://stanford-cs336.github.io/")],k:["Train a ~10–70M param model on a tokenised dataset","Use cosine LR schedule with warmup and gradient clipping","Evaluate perplexity on held-out data","Run one ablation with 3 seeds and report mean ± std","Write a 1-page experiment report"]}
-],m:"Milestone: your own small transformer with one novel variant and a fair, multi-seed comparison."},
-
-{t:"LLM inference optimisation",why:"Make models run fast and fit memory: kernels, KV cache, runtimes.",l:[
- {t:"Inference fundamentals",how:"Know prefill vs decode, KV cache and the metrics that matter.",r:[R("vLLM docs","https://docs.vllm.ai/"),R("PagedAttention paper","https://arxiv.org/abs/2309.06180")],k:["Add a KV cache to your GPT; measure tokens/s before and after","Explain why decode is memory-bound in your log","Measure TTFT and per-token latency for a small HF model","Run a model with vLLM and compare throughput to plain HF","Measure p50 and p95 latency under 20 concurrent requests"]},
- {t:"Quantisation",how:"Trade bits for memory; always measure quality loss.",r:[R("HF quantization guide","https://huggingface.co/docs/transformers/main/en/quantization/overview"),R("llama.cpp","https://github.com/ggml-org/llama.cpp")],k:["Run a model in fp16, int8 and 4-bit; record memory","Compare perplexity across precisions","Implement per-channel int8 weight quantisation yourself","Run a GGUF model with llama.cpp on CPU"]},
- {t:"Triton kernels",how:"Write GPU kernels in Python; follow the official tutorials in order.",r:[R("Triton tutorials","https://triton-lang.org/main/getting-started/tutorials/index.html")],k:["Write vector add in Triton","Write fused softmax; benchmark vs torch","Write a matmul kernel with autotuning","Write a simple flash-attention forward pass","Plug one kernel into your GPT and measure speedup"]},
- {t:"Rust/CUDA inference runtime",how:"Build a minimal runtime that loads your model weights and decodes on GPU.",r:[R("candle (Rust ML)","https://github.com/huggingface/candle"),R("cudarc (Rust CUDA bindings)","https://github.com/coreylowman/cudarc")],k:["Export your GPT weights to safetensors","Load them in Rust and run a forward pass on CPU","Launch your own CUDA kernel from Rust","Implement a KV-cache gather kernel for decode","Benchmark decode tokens/s vs your Triton/PyTorch version"]}
-],m:"Milestone: a Rust/CUDA decoder for your small model with a benchmark vs a PyTorch/Triton baseline."},
-
-{t:"Serving infrastructure",why:"Route, qualify and roll back inference in production.",l:[
- {t:"Networking essentials",how:"Enough networking to run services: TCP/IP, HTTP, DNS, ports.",r:[R("Cisco Networking Academy","https://www.netacad.com/"),R("Beej's Guide to Network Programming","https://beej.us/guide/bgnet/")],k:["Explain TCP handshake and subnetting in your log","Write a TCP echo server and client","Inspect HTTP traffic with curl -v and Wireshark","Take the Cisco CCNA intro or C++ essentials course (optional cert)"]},
- {t:"Backend & containers",how:"Wrap models in APIs and ship them in containers.",r:[R("FastAPI docs","https://fastapi.tiangolo.com/"),R("Docker get started","https://docs.docker.com/get-started/")],k:["Serve a model behind a FastAPI endpoint with streaming","Containerise it with a GPU-enabled Dockerfile","Load-test with a script sending concurrent requests","Add Prometheus-style metrics: latency, queue depth, errors"]},
- {t:"Routing, qualification & rollback",how:"Build a router in front of several workers and decide per request.",r:[R("SRE book: Load balancing","https://sre.google/sre-book/load-balancing-datacenter/"),R("Google SRE book","https://sre.google/sre-book/table-of-contents/")],k:["Run 2 inference workers; route round-robin","Route by queue length; compare p95 latency","Write a qualification test: model+GPU+engine must pass before serving","Add automatic fallback to a known-good config on failure","Compute cost per 1K requests from GPU-hour price"]}
-],m:"Milestone: a 2-worker serving stack with smart routing and a before/after latency and cost table."},
-
-{t:"AI agents & applications",why:"Desktop agents, memory, tool use, product apps.",l:[
- {t:"LLM APIs & tool use",how:"Build agents with a raw loop before using any framework.",r:[R("Anthropic tool use docs","https://docs.anthropic.com/en/docs/build-with-claude/tool-use"),R("Building effective agents","https://www.anthropic.com/research/building-effective-agents")],k:["Call an LLM API and stream a response","Add one tool (calculator) and handle tool calls in a loop","Add file read/write tools with safe path checks","Count tokens and cost per task; log them"]},
- {t:"Memory & retrieval",how:"Answers must cite the source passage.",r:[R("SQLite FTS5","https://www.sqlite.org/fts5.html"),R("sentence-transformers","https://www.sbert.net/")],k:["Chunk a folder of docs and index with SQLite FTS5","Add embedding search and compare with keyword search","Return answers with the exact source passage","Store long-term agent memory and recall it next session"]},
- {t:"Coding agent & local stack",how:"Agent edits code, shows diff, runs tests; everything local.",r:[R("Ollama","https://ollama.com/")],k:["Run a local model with Ollama","Make the agent propose an edit as a unified diff","Apply the diff and run tests; retry on failure","Benchmark tokens, peak memory and cost over 20 tasks"]},
- {t:"Product app",how:"Ship a real app with AI features end to end.",r:[R("Next.js docs","https://nextjs.org/docs")],k:["Build a small event app with auth and a database","Add AI-assisted event creation from a text prompt","Add a referral link flow","Deploy it and get 5 real users"]}
-],m:"Milestone: a local agent with citations and code-editing, plus one deployed AI app."},
-
-{t:"Research & founding",why:"Publish results, benchmark honestly, build a company.",l:[
- {t:"Reading & writing papers",how:"Read 1 paper a week with the three-pass method; write like a researcher.",r:[R("How to Read a Paper (Keshav)","https://web.stanford.edu/class/ee384m/Handouts/HowtoReadPaper.pdf"),R("Overleaf LaTeX guide","https://www.overleaf.com/learn")],k:["Read 4 papers with three-pass method; summarise each in 5 lines","Write your medical-imaging or LM project as a 4-page LaTeX paper","Add a limitations section that names every weak point","Post a preprint to arXiv or a blog"]},
- {t:"Benchmarking honestly",how:"Matched baselines, seeds, held-out data, report losses too.",r:[R("ML reproducibility checklist","https://www.cs.mcgill.ca/~jpineau/ReproducibilityChecklist.pdf")],k:["Re-run one result with 3 seeds and report spread","Add a baseline that beats you on one metric and report it","Publish scripts so others can reproduce","Write one page: what your numbers do not prove"]},
- {t:"Founder basics",how:"Talk to users first, build second.",r:[R("YC Startup School","https://www.startupschool.org/"),R("The Mom Test (book)","https://www.momtestbook.com/")],k:["Interview 5 potential users about GPU or inference cost pain","Write a 1-page problem/solution memo","Build a landing page and collect 20 sign-ups","Apply to a local incubator or accelerator"]}
-],m:"Milestone: one public preprint and one user-validated product idea."}
-];
-
-const KEY="journey-progress-v1";
-let done={};
-try{done=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
-const sb=SUPABASE_URL.startsWith("http")&&window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
-let user=null,timer=null;
-const status=t=>document.getElementById("who").textContent=t;
-async function push(){
-  if(!sb||!user)return;
-  const {error}=await sb.from("progress").upsert({user_id:user.id,done,updated_at:new Date().toISOString()});
-  status(error?`Sync failed: ${error.message}`:`Signed in as ${user.email}. Synced.`);
-}
-const save=()=>{
-  try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}
-  if(user){clearTimeout(timer);timer=setTimeout(push,600)}
-};
-async function onUser(u){
-  user=u;
-  document.getElementById("authctl").hidden=!!u;
-  document.getElementById("signout").hidden=!u;
-  if(!u){status("Not signed in. Progress is saved only in this browser.");return}
-  status(`Signed in as ${u.email}. Loading…`);
-  const {data,error}=await sb.from("progress").select("done").eq("user_id",u.id).maybeSingle();
-  if(error){status(`Load failed: ${error.message}`);return}
-  // ponytail: union merge, so a task unticked on one device can come back from another. Fine for a checklist.
-  done={...(data&&data.done||{}),...done};
-  render();push();
-}
-const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const id=(p,l,k)=>`${p}.${l}.${k}`;
-
-const phaseDone=pi=>DATA[pi].l.every((l,li)=>l.k.every((_,ki)=>done[id(pi,li,ki)]));
-const el=i=>document.getElementById(i);
-let firstRender=true;
-
-function phaseHTML(p,pi){
-  return `<details class="phase card" data-p="${pi}">
-    <summary><span class="num" id="num${pi}">${pi}</span>
-      <div><h3>${esc(p.t)}</h3><p class="why">${esc(p.why)}</p><div class="bar"><i id="bar${pi}"></i></div></div>
-      <span class="side"><span class="chip" id="pct${pi}"></span><span class="chev"></span></span></summary>
-    <div class="body">${p.l.map((l,li)=>`
-      <div class="lesson"><div class="lesson-h"><h4>${pi}.${li+1} ${esc(l.t)}</h4><small id="lc${pi}-${li}"></small></div>
-        <p class="how">${esc(l.how)}</p>
-        <p class="res">${l.r.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(n)}</a>`).join("")}</p>
-        <ul class="tasks">${l.k.map((k,ki)=>{const t=id(pi,li,ki);return `<li><label><input type="checkbox" data-id="${t}" ${done[t]?"checked":""}><span>${esc(k)}</span></label></li>`}).join("")}</ul>
-      </div>`).join("")}
-      <div class="milestone">${esc(p.m)}</div>
-    </div>
-  </details>`;
-}
-
-// Finished phases render collapsed in the "Completed" list at the bottom; open state of the rest is kept.
-function render(){
-  const open=new Set([...document.querySelectorAll("details[data-p][open]")].map(d=>+d.dataset.p));
-  const live=[],fin=[];
-  DATA.forEach((p,pi)=>(phaseDone(pi)?fin:live).push(phaseHTML(p,pi)));
-  el("phases").innerHTML=live.join("");
-  el("completed").innerHTML=fin.join("");
-  el("completed-h").hidden=!fin.length;
-  open.forEach(pi=>{if(!phaseDone(pi)){const d=document.querySelector(`details[data-p="${pi}"]`);if(d)d.open=true}});
-  update(firstRender);
-  firstRender=false;
-}
-
-function update(openNext){
-  let all=0,got=0,next=null,lessons=0,lessonsDone=0,phases=0;
-  DATA.forEach((p,pi)=>{
-    let a=0,g=0;
-    p.l.forEach((l,li)=>{
-      let la=0,lg=0;
-      l.k.forEach((k,ki)=>{la++;if(done[id(pi,li,ki)])lg++;else if(!next)next={pi,li,k,l}});
-      a+=la;g+=lg;lessons++;if(lg===la)lessonsDone++;
-      el(`lc${pi}-${li}`).textContent=`${lg}/${la}`;
-    });
-    all+=a;got+=g;
-    const complete=g===a;if(complete)phases++;
-    const d=document.querySelector(`details[data-p="${pi}"]`);
-    d.classList.toggle("complete",complete);
-    d.classList.toggle("current",!!next&&next.pi===pi&&!complete);
-    el("num"+pi).textContent=complete?"✓":pi;
-    el("pct"+pi).textContent=complete?"Done":g?`${g}/${a}`:`${a} tasks`;
-    el("bar"+pi).style.width=(100*g/a)+"%";
-  });
-  const pct=Math.round(100*got/all);
-  el("ring").style.setProperty("--p",pct);
-  el("pctbig").textContent=pct+"%";
-  el("ntasks").textContent=`${got} / ${all}`;
-  el("nlessons").textContent=`${lessonsDone} / ${lessons}`;
-  el("nphases").textContent=`${phases} / ${DATA.length}`;
-  el("totalbar").style.width=(100*got/all)+"%";
-  el("remain").textContent=`${DATA.length-phases} phases left`;
-  el("donecount").textContent=`${phases} done`;
-  const n=el("next");
-  if(next){n.innerHTML=`<span class="tag">Next up</span><span><b>${next.pi}.${next.li+1} ${esc(next.l.t)}</b> · ${esc(next.k)}</span>`;n.dataset.p=next.pi}
-  else{n.innerHTML=`<span class="tag">Done</span><span>All tasks complete. Go build.</span>`;delete n.dataset.p}
-  if(openNext&&next)document.querySelector(`details[data-p="${next.pi}"]`).open=true;
-}
-
-el("next").onclick=e=>{
-  const pi=e.currentTarget.dataset.p; if(pi===undefined)return;
-  e.preventDefault();
-  const d=document.querySelector(`details[data-p="${pi}"]`);d.open=true;d.scrollIntoView({behavior:"smooth",block:"start"});
-};
-
-document.addEventListener("change",e=>{
-  const t=e.target.dataset&&e.target.dataset.id; if(!t)return;
-  const pi=+t.split(".")[0],was=phaseDone(pi);
-  if(e.target.checked)done[t]=Date.now(); else delete done[t];
-  save();
-  if(was!==phaseDone(pi)){
-    // Phase just finished or reopened: move it between Roadmap and Completed.
-    if(!was)document.querySelector(`details[data-p="${pi}"]`).open=false;
-    render();
-    if(!was){const n=document.querySelector(`#phases details[data-p]`);if(n){n.open=true;n.scrollIntoView({behavior:"smooth",block:"start"})}}
-  }else update(false);
-});
-document.getElementById("auth").onsubmit=async e=>{
-  e.preventDefault();
-  if(!sb){status("Database not configured yet.");return}
-  const email=document.getElementById("email").value.trim();
-  const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname}});
-  status(error?`Login failed: ${error.message}`:`Login link sent to ${email}. Open it in this browser.`);
-};
-document.getElementById("signout").onclick=async()=>{await sb.auth.signOut()};
-if(sb){
-  sb.auth.onAuthStateChange((ev,s)=>{
-    const u=s&&s.user||null;
-    if((u&&u.id)!==(user&&user.id))setTimeout(()=>onUser(u),0);
-  });
-}else document.getElementById("auth").hidden=true;
-document.getElementById("rst").onclick=()=>{
-  const b=document.getElementById("rst");
-  if(b.dataset.arm){done={};save();render();b.textContent="Reset";delete b.dataset.arm}
-  else{b.dataset.arm=1;b.textContent="Click again to confirm";setTimeout(()=>{b.textContent="Reset";delete b.dataset.arm},3000)}
-};
-render();
-
-// ---------- Code playground ----------
-const STARTER={
- python:'import numpy as np\n\nname = input()\nprint(f"hello {name}")\nprint(np.arange(5) ** 2)\n',
- cpp:'#include <iostream>\n#include <vector>\n\nint main() {\n    int n; std::cin >> n;\n    std::vector<int> v(n);\n    for (int i = 0; i < n; ++i) v[i] = i * i;\n    for (int x : v) std::cout << x << " ";\n    std::cout << std::endl;\n}\n',
- rust:'use std::io::Read;\n\nfn main() {\n    let mut s = String::new();\n    std::io::stdin().read_to_string(&mut s).unwrap();\n    let n: u32 = s.trim().parse().unwrap_or(5);\n    let v: Vec<u32> = (0..n).map(|i| i * i).collect();\n    println!("{:?}", v);\n}\n',
- cuda:'#include <cstdio>\n\n__global__ void add(const float* a, const float* b, float* c, int n) {\n    int i = blockIdx.x * blockDim.x + threadIdx.x;\n    if (i < n) c[i] = a[i] + b[i];\n}\n\nint main() {\n    // Compiles here; kernels need a real GPU (Colab/Kaggle) to run.\n    printf("compiled ok\\n");\n}\n',
- sql:"CREATE TABLE runs(model TEXT, acc REAL);\nINSERT INTO runs VALUES ('resnet',0.91),('effnet',0.94),('resnet',0.93);\nSELECT model, MAX(acc) AS best FROM runs GROUP BY model;\n"
-};
-const CE={cpp:["g142","c++","-O2 -std=c++20"],rust:["r1990","rust","-O --edition 2021"],cuda:["nvcc129u1","cuda","-O2"]};
-const $=i=>document.getElementById(i);
-const CODEKEY=l=>"journey-code-"+l;
-const getCode=l=>{try{return localStorage.getItem(CODEKEY(l))}catch(e){return null}};
-const setCode=(l,v)=>{try{localStorage.setItem(CODEKEY(l),v)}catch(e){}};
-const stripAnsi=s=>s.replace(/\x1b\[[0-9;]*[mK]/g,"");
-let pyodide=null,SQL=null;
-const loadScript=src=>new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=()=>no(new Error("Failed to load "+src));document.head.appendChild(s)});
-
-function loadLang(){const l=$("lang").value;$("code").value=getCode(l)??STARTER[l];try{localStorage.setItem("journey-lang",l)}catch(e){}}
-try{const l=localStorage.getItem("journey-lang");if(l&&STARTER[l])$("lang").value=l}catch(e){}
-loadLang();
-$("lang").onchange=loadLang;
-$("code").oninput=()=>setCode($("lang").value,$("code").value);
-$("resetcode").onclick=()=>{$("code").value=STARTER[$("lang").value];setCode($("lang").value,$("code").value)};
-$("code").onkeydown=e=>{
-  if(e.key==="Tab"&&!e.shiftKey){e.preventDefault();document.execCommand("insertText",false,"    ")}
-  if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();run()}
-};
-
-// ponytail: Python runs on the main thread, so an infinite loop freezes the tab. Move Pyodide to a Web Worker if that bites.
-async function runPython(code,stdin){
-  if(!pyodide){
-    $("runout").textContent="Loading Python (first run only, ~10 MB)…";
-    await loadScript("https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js");
-    pyodide=await loadPyodide();
-  }
-  let out="",fed=false;
-  pyodide.setStdout({batched:s=>out+=s+"\n"});
-  pyodide.setStderr({batched:s=>out+=s+"\n"});
-  pyodide.setStdin({stdin:()=>fed?null:(fed=true,stdin)});
-  await pyodide.loadPackagesFromImports(code);
-  try{await pyodide.runPythonAsync(code);return {out,ok:true}}
-  catch(e){return {out:out+String(e.message||e),ok:false}}
-}
-async function runSQL(code){
-  if(!SQL){
-    $("runout").textContent="Loading SQLite…";
-    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js");
-    SQL=await initSqlJs({locateFile:f=>"https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/"+f});
-  }
-  const db=new SQL.Database();
-  try{
-    const res=db.exec(code);
-    if(!res.length)return {out:"(no rows)\n",ok:true};
-    return {ok:true,out:res.map(r=>[r.columns.join(" | "),...r.values.map(v=>v.join(" | "))].join("\n")).join("\n\n")+"\n"};
-  }catch(e){return {out:"Error: "+e.message,ok:false}}
-  finally{db.close()}
-}
-async function runRemote(lang,code,stdin){
-  const [id,l,args]=CE[lang];
-  $("runout").textContent="Compiling on godbolt.org…";
-  const r=await fetch(`https://godbolt.org/api/compiler/${id}/compile`,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},
-    body:JSON.stringify({source:code,lang:l,options:{userArguments:args,executeParameters:{stdin},compilerOptions:{executorRequest:true},filters:{execute:true},tools:[],libraries:[]}})});
-  if(!r.ok)throw new Error(`Compiler service returned HTTP ${r.status}`);
-  const d=await r.json();
-  const txt=a=>(a||[]).map(x=>stripAnsi(x.text)).join("\n");
-  if(!d.didExecute){const b=d.buildResult||{};return {ok:false,out:"Build failed:\n"+(txt(b.stderr)||txt(d.stderr))}}
-  const err=txt(d.stderr);
-  return {ok:d.code===0,out:txt(d.stdout)+(err?"\n[stderr]\n"+err:"")+(d.code!==0?`\n[exit code ${d.code}]`:"")};
-}
-async function run(){
-  const lang=$("lang").value,code=$("code").value,stdin=$("stdin").value;
-  const btn=$("runbtn");btn.disabled=true;$("verdict").textContent="";$("verdict").className="";
-  let res;
-  try{res=lang==="python"?await runPython(code,stdin):lang==="sql"?await runSQL(code):await runRemote(lang,code,stdin)}
-  catch(e){res={ok:false,out:"Error: "+e.message}}
-  btn.disabled=false;
-  $("runout").textContent=res.out||"(no output)";
-  const exp=$("expect").value;
-  if(exp.trim()){
-    // Compare ignoring trailing whitespace on each line and at the end.
-    const norm=s=>s.replace(/\r/g,"").split("\n").map(x=>x.trimEnd()).join("\n").trim();
-    const pass=res.ok&&norm(res.out)===norm(exp);
-    $("verdict").textContent=pass?"✓ Correct: output matches expected":"✗ Not matching expected output";
-    $("verdict").className=pass?"ok":"bad";
-  }
-}
-$("runbtn").onclick=run;
-</script>
+<script src="data.js?v=2"></script>
+<script src="lessons/p0.js?v=2"></script>
+<script src="lessons/p1.js?v=2" onerror="this.remove()"></script>
+<script src="lessons/p2.js?v=2" onerror="this.remove()"></script>
+<script src="lessons/p3.js?v=2" onerror="this.remove()"></script>
+<script src="lessons/p4.js?v=2" onerror="this.remove()"></script>
+<script src="lessons/p5.js?v=2" onerror="this.remove()"></script>
+<script src="lessons/p6.js?v=2" onerror="this.remove()"></script>
+<script src="lessons/p7.js?v=2" onerror="this.remove()"></script>
+<script src="lessons/p8.js?v=2" onerror="this.remove()"></script>
+<script src="lessons/p9.js?v=2" onerror="this.remove()"></script>
+<script src="lessons/p10.js?v=2" onerror="this.remove()"></script>
+<script src="lessons/p11.js?v=2" onerror="this.remove()"></script>
+<script src="lessons/p12.js?v=2" onerror="this.remove()"></script>
+<script src="app.js?v=2"></script>
 </body>
 </html>
