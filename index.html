@@ -44,6 +44,18 @@ ul.tasks input:checked+span{color:var(--done);text-decoration:line-through}
 .milestone{margin-top:10px;padding:10px 12px;border-left:3px solid var(--acc);background:var(--acc2);border-radius:0 8px 8px 0;font-size:.92rem}
 .auth{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:.9rem;color:var(--mute)}
 .auth[hidden]{display:none}
+.mono{font:13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}
+#play .num{font-size:.75rem}
+.pg-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.pg-row select{font:inherit;font-size:.85rem;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);max-width:100%}
+#runbtn{background:var(--acc);color:var(--bg);border-color:var(--acc);font-weight:600}
+#play textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);resize:vertical;tab-size:4}
+.pg-io{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.pg-io label{font-size:.8rem;color:var(--mute)}
+@media (max-width:560px){.pg-io{grid-template-columns:1fr}}
+#out{margin:8px 0 0;padding:10px;background:var(--bg);border:1px solid var(--line);border-radius:8px;white-space:pre-wrap;word-break:break-word;max-height:360px;overflow:auto}
+#verdict{margin-top:8px;font-weight:600}
+#verdict.ok{color:var(--acc)}#verdict.bad{color:#c0392b}
 .auth input{font:inherit;font-size:.85rem;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);max-width:220px}
 </style>
 </head>
@@ -64,6 +76,30 @@ ul.tasks input:checked+span{color:var(--done);text-decoration:line-through}
     <button type="button" id="out" hidden>Sign out</button>
   </form>
 </section>
+
+<details class="phase" id="play">
+  <summary><span class="num">&lt;/&gt;</span><div><h2>Code playground</h2><p class="why">Write and run Python, C++, Rust, CUDA or SQL. Add expected output to check your answer.</p></div><span class="pct">Ctrl+Enter</span></summary>
+  <div class="body">
+    <div class="pg-row">
+      <select id="lang" aria-label="Language">
+        <option value="python">Python 3 (in browser, numpy OK)</option>
+        <option value="cpp">C++20 (gcc 14.2)</option>
+        <option value="rust">Rust (rustc 1.99)</option>
+        <option value="cuda">CUDA (nvcc, no GPU: host code runs, kernels do not)</option>
+        <option value="sql">SQL (SQLite, in browser)</option>
+      </select>
+      <button id="runbtn">Run ▶</button>
+      <button id="resetcode" type="button">Reset code</button>
+    </div>
+    <textarea id="code" class="mono" spellcheck="false" aria-label="Code" rows="14"></textarea>
+    <div class="pg-io">
+      <label>stdin<textarea id="stdin" class="mono" rows="3" spellcheck="false"></textarea></label>
+      <label>expected output (optional)<textarea id="expect" class="mono" rows="3" spellcheck="false"></textarea></label>
+    </div>
+    <div id="verdict"></div>
+    <pre id="out" class="mono">Output appears here.</pre>
+  </div>
+</details>
 
 <div id="phases"></div>
 </main>
@@ -249,6 +285,94 @@ document.getElementById("rst").onclick=()=>{
   else{b.dataset.arm=1;b.textContent="Click again to confirm";setTimeout(()=>{b.textContent="Reset";delete b.dataset.arm},3000)}
 };
 render();
+
+// ---------- Code playground ----------
+const STARTER={
+ python:'import numpy as np\n\nname = input()\nprint(f"hello {name}")\nprint(np.arange(5) ** 2)\n',
+ cpp:'#include <iostream>\n#include <vector>\n\nint main() {\n    int n; std::cin >> n;\n    std::vector<int> v(n);\n    for (int i = 0; i < n; ++i) v[i] = i * i;\n    for (int x : v) std::cout << x << " ";\n    std::cout << std::endl;\n}\n',
+ rust:'use std::io::Read;\n\nfn main() {\n    let mut s = String::new();\n    std::io::stdin().read_to_string(&mut s).unwrap();\n    let n: u32 = s.trim().parse().unwrap_or(5);\n    let v: Vec<u32> = (0..n).map(|i| i * i).collect();\n    println!("{:?}", v);\n}\n',
+ cuda:'#include <cstdio>\n\n__global__ void add(const float* a, const float* b, float* c, int n) {\n    int i = blockIdx.x * blockDim.x + threadIdx.x;\n    if (i < n) c[i] = a[i] + b[i];\n}\n\nint main() {\n    // Compiles here; kernels need a real GPU (Colab/Kaggle) to run.\n    printf("compiled ok\\n");\n}\n',
+ sql:"CREATE TABLE runs(model TEXT, acc REAL);\nINSERT INTO runs VALUES ('resnet',0.91),('effnet',0.94),('resnet',0.93);\nSELECT model, MAX(acc) AS best FROM runs GROUP BY model;\n"
+};
+const CE={cpp:["g142","c++","-O2 -std=c++20"],rust:["r1990","rust","-O --edition 2021"],cuda:["nvcc129u1","cuda","-O2"]};
+const $=i=>document.getElementById(i);
+const CODEKEY=l=>"journey-code-"+l;
+const getCode=l=>{try{return localStorage.getItem(CODEKEY(l))}catch(e){return null}};
+const setCode=(l,v)=>{try{localStorage.setItem(CODEKEY(l),v)}catch(e){}};
+const stripAnsi=s=>s.replace(/\x1b\[[0-9;]*[mK]/g,"");
+let pyodide=null,SQL=null;
+const loadScript=src=>new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=()=>no(new Error("Failed to load "+src));document.head.appendChild(s)});
+
+function loadLang(){const l=$("lang").value;$("code").value=getCode(l)??STARTER[l];try{localStorage.setItem("journey-lang",l)}catch(e){}}
+try{const l=localStorage.getItem("journey-lang");if(l&&STARTER[l])$("lang").value=l}catch(e){}
+loadLang();
+$("lang").onchange=loadLang;
+$("code").oninput=()=>setCode($("lang").value,$("code").value);
+$("resetcode").onclick=()=>{$("code").value=STARTER[$("lang").value];setCode($("lang").value,$("code").value)};
+$("code").onkeydown=e=>{
+  if(e.key==="Tab"&&!e.shiftKey){e.preventDefault();document.execCommand("insertText",false,"    ")}
+  if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();run()}
+};
+
+// ponytail: Python runs on the main thread, so an infinite loop freezes the tab. Move Pyodide to a Web Worker if that bites.
+async function runPython(code,stdin){
+  if(!pyodide){
+    $("out").textContent="Loading Python (first run only, ~10 MB)…";
+    await loadScript("https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js");
+    pyodide=await loadPyodide();
+  }
+  let out="",fed=false;
+  pyodide.setStdout({batched:s=>out+=s+"\n"});
+  pyodide.setStderr({batched:s=>out+=s+"\n"});
+  pyodide.setStdin({stdin:()=>fed?null:(fed=true,stdin)});
+  await pyodide.loadPackagesFromImports(code);
+  try{await pyodide.runPythonAsync(code);return {out,ok:true}}
+  catch(e){return {out:out+String(e.message||e),ok:false}}
+}
+async function runSQL(code){
+  if(!SQL){
+    $("out").textContent="Loading SQLite…";
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js");
+    SQL=await initSqlJs({locateFile:f=>"https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/"+f});
+  }
+  const db=new SQL.Database();
+  try{
+    const res=db.exec(code);
+    if(!res.length)return {out:"(no rows)\n",ok:true};
+    return {ok:true,out:res.map(r=>[r.columns.join(" | "),...r.values.map(v=>v.join(" | "))].join("\n")).join("\n\n")+"\n"};
+  }catch(e){return {out:"Error: "+e.message,ok:false}}
+  finally{db.close()}
+}
+async function runRemote(lang,code,stdin){
+  const [id,l,args]=CE[lang];
+  $("out").textContent="Compiling on godbolt.org…";
+  const r=await fetch(`https://godbolt.org/api/compiler/${id}/compile`,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},
+    body:JSON.stringify({source:code,lang:l,options:{userArguments:args,executeParameters:{stdin},compilerOptions:{executorRequest:true},filters:{execute:true},tools:[],libraries:[]}})});
+  if(!r.ok)throw new Error(`Compiler service returned HTTP ${r.status}`);
+  const d=await r.json();
+  const txt=a=>(a||[]).map(x=>stripAnsi(x.text)).join("\n");
+  if(!d.didExecute){const b=d.buildResult||{};return {ok:false,out:"Build failed:\n"+(txt(b.stderr)||txt(d.stderr))}}
+  const err=txt(d.stderr);
+  return {ok:d.code===0,out:txt(d.stdout)+(err?"\n[stderr]\n"+err:"")+(d.code!==0?`\n[exit code ${d.code}]`:"")};
+}
+async function run(){
+  const lang=$("lang").value,code=$("code").value,stdin=$("stdin").value;
+  const btn=$("runbtn");btn.disabled=true;$("verdict").textContent="";$("verdict").className="";
+  let res;
+  try{res=lang==="python"?await runPython(code,stdin):lang==="sql"?await runSQL(code):await runRemote(lang,code,stdin)}
+  catch(e){res={ok:false,out:"Error: "+e.message}}
+  btn.disabled=false;
+  $("out").textContent=res.out||"(no output)";
+  const exp=$("expect").value;
+  if(exp.trim()){
+    // Compare ignoring trailing whitespace on each line and at the end.
+    const norm=s=>s.replace(/\r/g,"").split("\n").map(x=>x.trimEnd()).join("\n").trim();
+    const pass=res.ok&&norm(res.out)===norm(exp);
+    $("verdict").textContent=pass?"✓ Correct: output matches expected":"✗ Not matching expected output";
+    $("verdict").className=pass?"ok":"bad";
+  }
+}
+$("runbtn").onclick=run;
 </script>
 </body>
 </html>
