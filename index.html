@@ -42,7 +42,9 @@ ul.tasks label:hover{background:var(--acc2)}
 ul.tasks input{margin-top:5px;accent-color:var(--acc);width:16px;height:16px;flex:none}
 ul.tasks input:checked+span{color:var(--done);text-decoration:line-through}
 .milestone{margin-top:10px;padding:10px 12px;border-left:3px solid var(--acc);background:var(--acc2);border-radius:0 8px 8px 0;font-size:.92rem}
-input[type=file]{display:none}
+.auth{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:.9rem;color:var(--mute)}
+.auth[hidden]{display:none}
+.auth input{font:inherit;font-size:.85rem;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);max-width:220px}
 </style>
 </head>
 <body>
@@ -52,17 +54,25 @@ input[type=file]{display:none}
 
 <section class="top">
   <div class="row"><strong id="total">0 / 0 tasks</strong>
-    <span><button id="exp">Export progress</button> <button id="imp">Import</button> <button id="rst">Reset</button></span>
+    <span><button id="rst">Reset</button></span>
   </div>
   <div class="bar"><i id="totalbar"></i></div>
   <div class="next" id="next"></div>
-  <input type="file" id="file" accept=".json">
+  <form class="auth" id="auth">
+    <span id="who">Not signed in. Progress is saved only in this browser.</span>
+    <span id="authctl"><input type="email" id="email" placeholder="you@example.com" required aria-label="Email"> <button>Send login link</button></span>
+    <button type="button" id="out" hidden>Sign out</button>
+  </form>
 </section>
 
 <div id="phases"></div>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
+// Supabase project settings (Project Settings > API). The anon key is public by design; RLS protects data.
+const SUPABASE_URL="https://ktqpfofzgvnmvwynvbce.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_QvRKnCh6Ez3Kl5r5nDzjWg_rPDbGoeC";
 const R=(n,u)=>[n,u];
 const DATA=[
 {t:"Foundations",why:"Tools and math every later phase assumes.",l:[
@@ -155,7 +165,30 @@ const DATA=[
 const KEY="journey-progress-v1";
 let done={};
 try{done=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}};
+const sb=SUPABASE_URL.startsWith("http")&&window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+let user=null,timer=null;
+const status=t=>document.getElementById("who").textContent=t;
+async function push(){
+  if(!sb||!user)return;
+  const {error}=await sb.from("progress").upsert({user_id:user.id,done,updated_at:new Date().toISOString()});
+  status(error?`Sync failed: ${error.message}`:`Signed in as ${user.email}. Synced.`);
+}
+const save=()=>{
+  try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}
+  if(user){clearTimeout(timer);timer=setTimeout(push,600)}
+};
+async function onUser(u){
+  user=u;
+  document.getElementById("authctl").hidden=!!u;
+  document.getElementById("out").hidden=!u;
+  if(!u){status("Not signed in. Progress is saved only in this browser.");return}
+  status(`Signed in as ${u.email}. Loading…`);
+  const {data,error}=await sb.from("progress").select("done").eq("user_id",u.id).maybeSingle();
+  if(error){status(`Load failed: ${error.message}`);return}
+  // ponytail: union merge, so a task unticked on one device can come back from another. Fine for a checklist.
+  done={...(data&&data.done||{}),...done};
+  render();push();
+}
 const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const id=(p,l,k)=>`${p}.${l}.${k}`;
 
@@ -196,17 +229,20 @@ document.addEventListener("change",e=>{
   if(e.target.checked)done[t]=Date.now(); else delete done[t];
   save();update(false);
 });
-document.getElementById("exp").onclick=()=>{
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([JSON.stringify(done)],{type:"application/json"}));
-  a.download="journey-progress.json";a.click();
+document.getElementById("auth").onsubmit=async e=>{
+  e.preventDefault();
+  if(!sb){status("Database not configured yet.");return}
+  const email=document.getElementById("email").value.trim();
+  const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname}});
+  status(error?`Login failed: ${error.message}`:`Login link sent to ${email}. Open it in this browser.`);
 };
-document.getElementById("imp").onclick=()=>document.getElementById("file").click();
-document.getElementById("file").onchange=async e=>{
-  const f=e.target.files[0]; if(!f)return;
-  try{const d=JSON.parse(await f.text()); if(typeof d!=="object"||Array.isArray(d))throw 0; done=d;save();render();}
-  catch(_){document.getElementById("next").textContent="Import failed: not a valid progress file."}
-};
+document.getElementById("out").onclick=async()=>{await sb.auth.signOut()};
+if(sb){
+  sb.auth.onAuthStateChange((ev,s)=>{
+    const u=s&&s.user||null;
+    if((u&&u.id)!==(user&&user.id))setTimeout(()=>onUser(u),0);
+  });
+}else document.getElementById("auth").hidden=true;
 document.getElementById("rst").onclick=()=>{
   const b=document.getElementById("rst");
   if(b.dataset.arm){done={};save();render();b.textContent="Reset";delete b.dataset.arm}
