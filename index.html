@@ -4,81 +4,140 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GPU-to-AI Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f7f6f2;--card:#fff;--ink:#1d1d1b;--mute:#6b6a64;--line:#e3e1d9;--acc:#2f6f4f;--acc2:#d9eadf;--done:#9a9890}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141413;--card:#1e1e1c;--ink:#ecebe6;--mute:#9a9890;--line:#30302c;--acc:#6fbf8f;--acc2:#23392c;--done:#6b6a64}}
-:root[data-theme="dark"]{--bg:#141413;--card:#1e1e1c;--ink:#ecebe6;--mute:#9a9890;--line:#30302c;--acc:#6fbf8f;--acc2:#23392c;--done:#6b6a64}
+:root{--bg:#f6f5f1;--card:#fff;--soft:#f0efe9;--ink:#1c1c1a;--mute:#6b6a64;--line:#e4e2da;--acc:#2f6f4f;--acc-ink:#fff;--acc2:#e1eee5;--done:#9a9890;--bad:#b3261e;--shadow:0 1px 2px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.04)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121211;--card:#1b1b19;--soft:#232320;--ink:#ecebe6;--mute:#9a9890;--line:#2e2e2a;--acc:#6fbf8f;--acc-ink:#0f1a13;--acc2:#1f3327;--done:#6b6a64;--bad:#f2867c;--shadow:none}}
+:root[data-theme="dark"]{--bg:#121211;--card:#1b1b19;--soft:#232320;--ink:#ecebe6;--mute:#9a9890;--line:#2e2e2a;--acc:#6fbf8f;--acc-ink:#0f1a13;--acc2:#1f3327;--done:#6b6a64;--bad:#f2867c;--shadow:none}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif}
-main{max-width:860px;margin:0 auto;padding:32px 16px 80px}
-h1{font-size:1.9rem;margin:0 0 4px}
-.sub{color:var(--mute);margin:0 0 24px}
-.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
-.bar>i{display:block;height:100%;background:var(--acc);width:0;transition:width .3s}
-.top{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:24px}
-.top .row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
-.next{margin-top:12px;font-size:.95rem;color:var(--mute)}
-.next b{color:var(--ink)}
-button{font:inherit;font-size:.85rem;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:15.5px/1.6 Inter,system-ui,-apple-system,Segoe UI,sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:880px;margin:0 auto;padding:40px 16px 96px}
+a{color:var(--acc)}
+.eyebrow{font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);margin:0 0 8px}
+h1{font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.15;letter-spacing:-.02em;margin:0 0 10px}
+.sub{color:var(--mute);margin:0 0 28px;max-width:640px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+.bar{height:6px;background:var(--soft);border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--acc);width:0;border-radius:99px;transition:width .4s ease}
+button{font:inherit;font-size:.85rem;font-weight:500;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:7px 12px;cursor:pointer;transition:border-color .15s,background .15s}
 button:hover{border-color:var(--acc)}
-details.phase{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:14px}
-details.phase>summary{cursor:pointer;padding:16px;list-style:none;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+button:disabled{opacity:.6;cursor:wait}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.btn-primary{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-ghost{border-color:transparent;background:transparent;color:var(--mute)}
+input[type=email],select,textarea{font:inherit;font-size:.88rem;padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+
+/* Overview */
+.top{padding:20px;margin-bottom:8px}
+.stats{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center}
+.ring{--p:0;width:92px;height:92px;border-radius:50%;background:conic-gradient(var(--acc) calc(var(--p)*1%),var(--soft) 0);display:grid;place-items:center;transition:background .4s}
+.ring span{width:74px;height:74px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-weight:700;font-size:1.25rem;font-variant-numeric:tabular-nums}
+.nums{display:flex;flex-wrap:wrap;gap:8px 28px}
+.nums div{min-width:90px}
+.nums b{display:block;font-size:1.15rem;font-variant-numeric:tabular-nums}
+.nums small{color:var(--mute);font-size:.8rem}
+.next{display:flex;gap:12px;align-items:baseline;margin-top:18px;padding:12px 14px;border-radius:12px;background:var(--acc2);color:var(--ink);text-decoration:none;font-size:.92rem}
+.next:hover{filter:brightness(.98)}
+.next .tag{flex:none;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--acc)}
+.auth{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;font-size:.88rem;color:var(--mute)}
+.auth .ctl{display:flex;gap:8px;flex-wrap:wrap}
+.auth .ctl[hidden],[hidden]{display:none!important}
+.auth input{width:220px;max-width:100%}
+@media (max-width:520px){.stats{grid-template-columns:1fr;justify-items:start}}
+
+/* Sections */
+.section-h{display:flex;align-items:baseline;justify-content:space-between;margin:32px 4px 12px}
+.section-h h2{font-size:.8rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:0}
+.section-h span{font-size:.8rem;color:var(--mute)}
+
+/* Phase cards */
+details.phase{margin-bottom:12px;overflow:hidden;transition:border-color .2s}
+details.phase.current{border-color:var(--acc)}
+details.phase>summary{cursor:pointer;padding:16px 18px;list-style:none;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center}
 details.phase>summary::-webkit-details-marker{display:none}
-.num{width:34px;height:34px;border-radius:50%;background:var(--acc2);color:var(--acc);display:grid;place-items:center;font-weight:700}
-.phase h2{font-size:1.1rem;margin:0}
-.phase .why{color:var(--mute);font-size:.9rem;margin:2px 0 0}
-.pct{font-variant-numeric:tabular-nums;color:var(--mute);font-size:.9rem}
-.phase .bar{margin:0 16px 4px}
-.body{padding:8px 16px 16px}
-.lesson{border-top:1px solid var(--line);padding:14px 0}
-.lesson h3{font-size:1rem;margin:0 0 4px}
-.how{color:var(--mute);font-size:.92rem;margin:0 0 8px}
-.res{font-size:.88rem;margin:0 0 8px;display:flex;flex-wrap:wrap;gap:6px 12px}
-.res a{color:var(--acc)}
+.num{width:38px;height:38px;border-radius:12px;background:var(--soft);color:var(--mute);display:grid;place-items:center;font-weight:700;font-size:.95rem}
+.current .num{background:var(--acc);color:var(--acc-ink)}
+.complete .num{background:var(--acc2);color:var(--acc)}
+.phase h3{font-size:1.02rem;font-weight:600;margin:0;letter-spacing:-.01em}
+.phase .why{color:var(--mute);font-size:.88rem;margin:2px 0 8px}
+.phase summary .bar{max-width:260px}
+.side{display:flex;align-items:center;gap:10px}
+.chip{font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--soft);color:var(--mute);white-space:nowrap;font-variant-numeric:tabular-nums}
+.current .chip,.complete .chip{background:var(--acc2);color:var(--acc)}
+.chev{width:9px;height:9px;border-right:2px solid var(--mute);border-bottom:2px solid var(--mute);transform:rotate(45deg);transition:transform .2s;margin:0 4px 4px}
+details[open]>summary .chev{transform:rotate(225deg);margin:4px 4px 0}
+.complete h3{color:var(--mute)}
+.body{padding:0 18px 18px}
+.lesson{border-top:1px solid var(--line);padding:16px 0}
+.lesson-h{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.lesson h4{font-size:.98rem;font-weight:600;margin:0 0 4px}
+.lesson-h small{color:var(--mute);font-size:.78rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.how{color:var(--mute);font-size:.9rem;margin:0 0 10px}
+.res{margin:0 0 10px;display:flex;flex-wrap:wrap;gap:6px}
+.res a{font-size:.8rem;text-decoration:none;padding:3px 10px;border:1px solid var(--line);border-radius:99px;color:var(--ink);background:var(--bg)}
+.res a:hover{border-color:var(--acc);color:var(--acc)}
+.res a::after{content:" ↗";color:var(--mute)}
 ul.tasks{list-style:none;margin:0;padding:0}
-ul.tasks li{margin:4px 0}
-ul.tasks label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:4px 6px;border-radius:6px}
-ul.tasks label:hover{background:var(--acc2)}
-ul.tasks input{margin-top:5px;accent-color:var(--acc);width:16px;height:16px;flex:none}
+ul.tasks label{display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:7px 8px;margin:0 -8px;border-radius:10px;font-size:.93rem}
+ul.tasks label:hover{background:var(--soft)}
+ul.tasks input{appearance:none;-webkit-appearance:none;flex:none;width:18px;height:18px;margin:3px 0 0;border:1.5px solid var(--mute);border-radius:6px;display:grid;place-items:center;cursor:pointer;transition:background .15s,border-color .15s}
+ul.tasks input::after{content:"";width:5px;height:9px;border-right:2px solid var(--acc-ink);border-bottom:2px solid var(--acc-ink);transform:rotate(45deg) scale(0);margin-top:-2px;transition:transform .15s}
+ul.tasks input:checked{background:var(--acc);border-color:var(--acc)}
+ul.tasks input:checked::after{transform:rotate(45deg) scale(1)}
 ul.tasks input:checked+span{color:var(--done);text-decoration:line-through}
-.milestone{margin-top:10px;padding:10px 12px;border-left:3px solid var(--acc);background:var(--acc2);border-radius:0 8px 8px 0;font-size:.92rem}
-.auth{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:.9rem;color:var(--mute)}
-.auth[hidden]{display:none}
-.mono{font:13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}
-#play .num{font-size:.75rem}
-.pg-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
-.pg-row select{font:inherit;font-size:.85rem;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);max-width:100%}
-#runbtn{background:var(--acc);color:var(--bg);border-color:var(--acc);font-weight:600}
-#play textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);resize:vertical;tab-size:4}
-.pg-io{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-.pg-io label{font-size:.8rem;color:var(--mute)}
+.milestone{margin-top:6px;padding:12px 14px;border-radius:12px;background:var(--acc2);font-size:.9rem}
+.milestone::before{content:"★ ";color:var(--acc)}
+
+/* Playground */
+.mono{font:13px/1.55 "JetBrains Mono",ui-monospace,Consolas,monospace}
+#play{margin-top:20px}
+#play .num{font-size:.7rem;color:var(--acc)}
+.pg-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.pg-row select{flex:1 1 220px;max-width:100%}
+#play textarea{width:100%;padding:12px;resize:vertical;tab-size:4}
+#code{background:var(--soft);min-height:240px}
+.pg-io{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.pg-io label{font-size:.78rem;font-weight:500;color:var(--mute);display:grid;gap:4px}
 @media (max-width:560px){.pg-io{grid-template-columns:1fr}}
-#out{margin:8px 0 0;padding:10px;background:var(--bg);border:1px solid var(--line);border-radius:8px;white-space:pre-wrap;word-break:break-word;max-height:360px;overflow:auto}
-#verdict{margin-top:8px;font-weight:600}
-#verdict.ok{color:var(--acc)}#verdict.bad{color:#c0392b}
-.auth input{font:inherit;font-size:.85rem;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);max-width:220px}
+.outwrap{margin-top:12px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.outwrap .h{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 12px;background:var(--soft);font-size:.75rem;color:var(--mute);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+#verdict{text-transform:none;letter-spacing:0;font-size:.82rem}
+#verdict.ok{color:var(--acc)}#verdict.bad{color:var(--bad)}
+#runout{margin:0;padding:12px;background:var(--bg);white-space:pre-wrap;word-break:break-word;max-height:360px;overflow:auto}
 </style>
 </head>
 <body>
 <main>
+<p class="eyebrow">Learning path</p>
 <h1>From Pixels to GPU-Native AI</h1>
-<p class="sub">Learning path built from the skill set in Rameel Malik's profile: graphics, C++/CUDA, deep learning, medical 3-D vision, transformers, LLM serving, agents. Phases are in dependency order. Each lesson has a method, a few resources and micro tasks of 15–60 minutes. Progress saves in this browser.</p>
+<p class="sub">Built from the skill set in Rameel Malik's profile: graphics, C++/CUDA, deep learning, medical 3-D vision, transformers, LLM serving and agents. Phases follow dependency order. Each task takes 15–60 minutes.</p>
 
-<section class="top">
-  <div class="row"><strong id="total">0 / 0 tasks</strong>
-    <span><button id="rst">Reset</button></span>
+<section class="top card">
+  <div class="stats">
+    <div class="ring" id="ring"><span id="pctbig">0%</span></div>
+    <div>
+      <div class="nums">
+        <div><b id="ntasks">0 / 0</b><small>tasks done</small></div>
+        <div><b id="nlessons">0 / 0</b><small>lessons complete</small></div>
+        <div><b id="nphases">0 / 0</b><small>phases complete</small></div>
+      </div>
+      <div class="bar" style="margin-top:12px"><i id="totalbar"></i></div>
+    </div>
   </div>
-  <div class="bar"><i id="totalbar"></i></div>
-  <div class="next" id="next"></div>
+  <a class="next" id="next" href="#phases"></a>
   <form class="auth" id="auth">
     <span id="who">Not signed in. Progress is saved only in this browser.</span>
-    <span id="authctl"><input type="email" id="email" placeholder="you@example.com" required aria-label="Email"> <button>Send login link</button></span>
-    <button type="button" id="out" hidden>Sign out</button>
+    <span class="ctl" id="authctl"><input type="email" id="email" placeholder="you@example.com" required aria-label="Email"><button class="btn-primary">Send login link</button></span>
+    <span class="ctl"><button type="button" id="signout" hidden>Sign out</button><button type="button" id="rst" class="btn-ghost">Reset progress</button></span>
   </form>
 </section>
 
-<details class="phase" id="play">
-  <summary><span class="num">&lt;/&gt;</span><div><h2>Code playground</h2><p class="why">Write and run Python, C++, Rust, CUDA or SQL. Add expected output to check your answer.</p></div><span class="pct">Ctrl+Enter</span></summary>
+<details class="phase card" id="play">
+  <summary><span class="num">&lt;/&gt;</span><div><h3>Code playground</h3><p class="why" style="margin-bottom:0">Run Python, C++, Rust, CUDA or SQL. Add expected output to check your answer.</p></div><span class="side"><span class="chip">Ctrl+Enter</span><span class="chev"></span></span></summary>
   <div class="body">
     <div class="pg-row">
       <select id="lang" aria-label="Language">
@@ -88,20 +147,22 @@ ul.tasks input:checked+span{color:var(--done);text-decoration:line-through}
         <option value="cuda">CUDA (nvcc, no GPU: host code runs, kernels do not)</option>
         <option value="sql">SQL (SQLite, in browser)</option>
       </select>
-      <button id="runbtn">Run ▶</button>
       <button id="resetcode" type="button">Reset code</button>
+      <button id="runbtn" class="btn-primary">Run ▶</button>
     </div>
     <textarea id="code" class="mono" spellcheck="false" aria-label="Code" rows="14"></textarea>
     <div class="pg-io">
       <label>stdin<textarea id="stdin" class="mono" rows="3" spellcheck="false"></textarea></label>
-      <label>expected output (optional)<textarea id="expect" class="mono" rows="3" spellcheck="false"></textarea></label>
+      <label>Expected output (optional)<textarea id="expect" class="mono" rows="3" spellcheck="false"></textarea></label>
     </div>
-    <div id="verdict"></div>
-    <pre id="out" class="mono">Output appears here.</pre>
+    <div class="outwrap"><div class="h"><span>Output</span><span id="verdict"></span></div><pre id="runout" class="mono">Output appears here.</pre></div>
   </div>
 </details>
 
+<div class="section-h"><h2>Roadmap</h2><span id="remain"></span></div>
 <div id="phases"></div>
+<div class="section-h" id="completed-h" hidden><h2>Completed</h2><span id="donecount"></span></div>
+<div id="completed"></div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
@@ -216,7 +277,7 @@ const save=()=>{
 async function onUser(u){
   user=u;
   document.getElementById("authctl").hidden=!!u;
-  document.getElementById("out").hidden=!u;
+  document.getElementById("signout").hidden=!u;
   if(!u){status("Not signed in. Progress is saved only in this browser.");return}
   status(`Signed in as ${u.email}. Loading…`);
   const {data,error}=await sb.from("progress").select("done").eq("user_id",u.id).maybeSingle();
@@ -228,42 +289,90 @@ async function onUser(u){
 const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const id=(p,l,k)=>`${p}.${l}.${k}`;
 
-function render(){
-  document.getElementById("phases").innerHTML=DATA.map((p,pi)=>`
-  <details class="phase" data-p="${pi}">
-    <summary><span class="num">${pi}</span><div><h2>${esc(p.t)}</h2><p class="why">${esc(p.why)}</p></div><span class="pct" id="pct${pi}"></span></summary>
-    <div class="bar"><i id="bar${pi}"></i></div>
+const phaseDone=pi=>DATA[pi].l.every((l,li)=>l.k.every((_,ki)=>done[id(pi,li,ki)]));
+const el=i=>document.getElementById(i);
+let firstRender=true;
+
+function phaseHTML(p,pi){
+  return `<details class="phase card" data-p="${pi}">
+    <summary><span class="num" id="num${pi}">${pi}</span>
+      <div><h3>${esc(p.t)}</h3><p class="why">${esc(p.why)}</p><div class="bar"><i id="bar${pi}"></i></div></div>
+      <span class="side"><span class="chip" id="pct${pi}"></span><span class="chev"></span></span></summary>
     <div class="body">${p.l.map((l,li)=>`
-      <div class="lesson"><h3>${pi}.${li+1} ${esc(l.t)}</h3>
+      <div class="lesson"><div class="lesson-h"><h4>${pi}.${li+1} ${esc(l.t)}</h4><small id="lc${pi}-${li}"></small></div>
         <p class="how">${esc(l.how)}</p>
         <p class="res">${l.r.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(n)}</a>`).join("")}</p>
         <ul class="tasks">${l.k.map((k,ki)=>{const t=id(pi,li,ki);return `<li><label><input type="checkbox" data-id="${t}" ${done[t]?"checked":""}><span>${esc(k)}</span></label></li>`}).join("")}</ul>
       </div>`).join("")}
       <div class="milestone">${esc(p.m)}</div>
     </div>
-  </details>`).join("");
-  update(true);
+  </details>`;
+}
+
+// Finished phases render collapsed in the "Completed" list at the bottom; open state of the rest is kept.
+function render(){
+  const open=new Set([...document.querySelectorAll("details[data-p][open]")].map(d=>+d.dataset.p));
+  const live=[],fin=[];
+  DATA.forEach((p,pi)=>(phaseDone(pi)?fin:live).push(phaseHTML(p,pi)));
+  el("phases").innerHTML=live.join("");
+  el("completed").innerHTML=fin.join("");
+  el("completed-h").hidden=!fin.length;
+  open.forEach(pi=>{if(!phaseDone(pi)){const d=document.querySelector(`details[data-p="${pi}"]`);if(d)d.open=true}});
+  update(firstRender);
+  firstRender=false;
 }
 
 function update(openNext){
-  let all=0,got=0,next=null;
+  let all=0,got=0,next=null,lessons=0,lessonsDone=0,phases=0;
   DATA.forEach((p,pi)=>{
     let a=0,g=0;
-    p.l.forEach((l,li)=>l.k.forEach((k,ki)=>{a++;const t=id(pi,li,ki);if(done[t])g++;else if(!next)next={pi,li,k,l}}));
+    p.l.forEach((l,li)=>{
+      let la=0,lg=0;
+      l.k.forEach((k,ki)=>{la++;if(done[id(pi,li,ki)])lg++;else if(!next)next={pi,li,k,l}});
+      a+=la;g+=lg;lessons++;if(lg===la)lessonsDone++;
+      el(`lc${pi}-${li}`).textContent=`${lg}/${la}`;
+    });
     all+=a;got+=g;
-    document.getElementById("pct"+pi).textContent=`${g}/${a}`;
-    document.getElementById("bar"+pi).style.width=(100*g/a)+"%";
+    const complete=g===a;if(complete)phases++;
+    const d=document.querySelector(`details[data-p="${pi}"]`);
+    d.classList.toggle("complete",complete);
+    d.classList.toggle("current",!!next&&next.pi===pi&&!complete);
+    el("num"+pi).textContent=complete?"✓":pi;
+    el("pct"+pi).textContent=complete?"Done":g?`${g}/${a}`:`${a} tasks`;
+    el("bar"+pi).style.width=(100*g/a)+"%";
   });
-  document.getElementById("total").textContent=`${got} / ${all} tasks · ${Math.round(100*got/all)}%`;
-  document.getElementById("totalbar").style.width=(100*got/all)+"%";
-  document.getElementById("next").innerHTML=next?`Next up: <b>${next.pi}.${next.li+1} ${esc(next.l.t)}</b> — ${esc(next.k)}`:"All tasks done. Go build.";
+  const pct=Math.round(100*got/all);
+  el("ring").style.setProperty("--p",pct);
+  el("pctbig").textContent=pct+"%";
+  el("ntasks").textContent=`${got} / ${all}`;
+  el("nlessons").textContent=`${lessonsDone} / ${lessons}`;
+  el("nphases").textContent=`${phases} / ${DATA.length}`;
+  el("totalbar").style.width=(100*got/all)+"%";
+  el("remain").textContent=`${DATA.length-phases} phases left`;
+  el("donecount").textContent=`${phases} done`;
+  const n=el("next");
+  if(next){n.innerHTML=`<span class="tag">Next up</span><span><b>${next.pi}.${next.li+1} ${esc(next.l.t)}</b> · ${esc(next.k)}</span>`;n.dataset.p=next.pi}
+  else{n.innerHTML=`<span class="tag">Done</span><span>All tasks complete. Go build.</span>`;delete n.dataset.p}
   if(openNext&&next)document.querySelector(`details[data-p="${next.pi}"]`).open=true;
 }
 
+el("next").onclick=e=>{
+  const pi=e.currentTarget.dataset.p; if(pi===undefined)return;
+  e.preventDefault();
+  const d=document.querySelector(`details[data-p="${pi}"]`);d.open=true;d.scrollIntoView({behavior:"smooth",block:"start"});
+};
+
 document.addEventListener("change",e=>{
   const t=e.target.dataset&&e.target.dataset.id; if(!t)return;
+  const pi=+t.split(".")[0],was=phaseDone(pi);
   if(e.target.checked)done[t]=Date.now(); else delete done[t];
-  save();update(false);
+  save();
+  if(was!==phaseDone(pi)){
+    // Phase just finished or reopened: move it between Roadmap and Completed.
+    if(!was)document.querySelector(`details[data-p="${pi}"]`).open=false;
+    render();
+    if(!was){const n=document.querySelector(`#phases details[data-p]`);if(n){n.open=true;n.scrollIntoView({behavior:"smooth",block:"start"})}}
+  }else update(false);
 });
 document.getElementById("auth").onsubmit=async e=>{
   e.preventDefault();
@@ -272,7 +381,7 @@ document.getElementById("auth").onsubmit=async e=>{
   const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname}});
   status(error?`Login failed: ${error.message}`:`Login link sent to ${email}. Open it in this browser.`);
 };
-document.getElementById("out").onclick=async()=>{await sb.auth.signOut()};
+document.getElementById("signout").onclick=async()=>{await sb.auth.signOut()};
 if(sb){
   sb.auth.onAuthStateChange((ev,s)=>{
     const u=s&&s.user||null;
@@ -317,7 +426,7 @@ $("code").onkeydown=e=>{
 // ponytail: Python runs on the main thread, so an infinite loop freezes the tab. Move Pyodide to a Web Worker if that bites.
 async function runPython(code,stdin){
   if(!pyodide){
-    $("out").textContent="Loading Python (first run only, ~10 MB)…";
+    $("runout").textContent="Loading Python (first run only, ~10 MB)…";
     await loadScript("https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js");
     pyodide=await loadPyodide();
   }
@@ -331,7 +440,7 @@ async function runPython(code,stdin){
 }
 async function runSQL(code){
   if(!SQL){
-    $("out").textContent="Loading SQLite…";
+    $("runout").textContent="Loading SQLite…";
     await loadScript("https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js");
     SQL=await initSqlJs({locateFile:f=>"https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/"+f});
   }
@@ -345,7 +454,7 @@ async function runSQL(code){
 }
 async function runRemote(lang,code,stdin){
   const [id,l,args]=CE[lang];
-  $("out").textContent="Compiling on godbolt.org…";
+  $("runout").textContent="Compiling on godbolt.org…";
   const r=await fetch(`https://godbolt.org/api/compiler/${id}/compile`,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},
     body:JSON.stringify({source:code,lang:l,options:{userArguments:args,executeParameters:{stdin},compilerOptions:{executorRequest:true},filters:{execute:true},tools:[],libraries:[]}})});
   if(!r.ok)throw new Error(`Compiler service returned HTTP ${r.status}`);
@@ -362,7 +471,7 @@ async function run(){
   try{res=lang==="python"?await runPython(code,stdin):lang==="sql"?await runSQL(code):await runRemote(lang,code,stdin)}
   catch(e){res={ok:false,out:"Error: "+e.message}}
   btn.disabled=false;
-  $("out").textContent=res.out||"(no output)";
+  $("runout").textContent=res.out||"(no output)";
   const exp=$("expect").value;
   if(exp.trim()){
     // Compare ignoring trailing whitespace on each line and at the end.
